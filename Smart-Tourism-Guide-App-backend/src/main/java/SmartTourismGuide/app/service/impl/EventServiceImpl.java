@@ -1,0 +1,208 @@
+package SmartTourismGuide.app.service.impl;
+
+import SmartTourismGuide.app.dto.request.CreateEventRequest;
+import SmartTourismGuide.app.dto.request.UpdateEventRequest;
+import SmartTourismGuide.app.dto.response.EventDto;
+import SmartTourismGuide.app.dto.response.EventSummaryDto;
+import SmartTourismGuide.app.entity.Event;
+import SmartTourismGuide.app.enums.EventCategory;
+import SmartTourismGuide.app.exceptions.EventNotFoundException;
+import SmartTourismGuide.app.exceptions.InvalidDateRangeException;
+import SmartTourismGuide.app.mapper.EventMapper;
+import SmartTourismGuide.app.repository.EventRepository;
+import SmartTourismGuide.app.service.EventService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class EventServiceImpl implements EventService {
+
+    private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
+
+    @Override
+    @Transactional
+    public EventDto createEvent(CreateEventRequest request) {
+        log.info("Creating new event: {}", request.getName());
+
+        Event event = eventMapper.toEntity(request);
+        Event savedEvent = eventRepository.save(event);
+
+        log.info("Event created successfully with id: {}", savedEvent.getId());
+        return eventMapper.toDto(savedEvent);
+    }
+
+    @Override
+    @Transactional
+    public EventDto updateEvent(Long id, UpdateEventRequest request) {
+        log.info("Updating event with id: {}", id);
+
+        Event event = eventRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+
+        eventMapper.updateEntity(event, request);
+        Event updatedEvent = eventRepository.save(event);
+
+        log.info("Event updated successfully: {}", id);
+        return eventMapper.toDto(updatedEvent);
+    }
+
+    @Override
+    @Transactional
+    public void deleteEvent(Long id) {
+        log.info("Soft deleting event with id: {}", id);
+
+        Event event = eventRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+
+        event.setDeleted(true);
+        eventRepository.save(event);
+
+        log.info("Event soft deleted successfully: {}", id);
+    }
+
+    @Override
+    @Transactional
+    public void restoreEvent(Long id) {
+        log.info("Restoring event with id: {}", id);
+
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+
+        if (!event.getDeleted()) {
+            log.warn("Event {} is not deleted, no action needed", id);
+            return;
+        }
+
+        event.setDeleted(false);
+        eventRepository.save(event);
+
+        log.info("Event restored successfully: {}", id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> getUpcomingEvents(Pageable pageable) {
+        log.info("Fetching upcoming events");
+
+        LocalDate today = LocalDate.now();
+        Page<Event> events = eventRepository.findUpcomingEvents(today, pageable);
+
+        return events.map(eventMapper::toSummaryDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> getCurrentEvents(Pageable pageable) {
+        log.info("Fetching current events");
+
+        LocalDate today = LocalDate.now();
+        Page<Event> events = eventRepository.findCurrentEvents(today, pageable);
+
+        return events.map(eventMapper::toSummaryDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> getEventsByDateRange(LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        log.info("Fetching events between {} and {}", startDate, endDate);
+
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidDateRangeException("Start date must be before or equal to end date");
+        }
+
+        Page<Event> events = eventRepository.findEventsByDateRange(startDate, endDate, pageable);
+
+        return events.map(eventMapper::toSummaryDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> getEventsByCity(String city, Pageable pageable) {
+        log.info("Fetching events for city: {}", city);
+
+        LocalDate today = LocalDate.now();
+        Page<Event> events = eventRepository.findEventsByCity(city, today, pageable);
+
+        return events.map(eventMapper::toSummaryDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> getEventsByCategory(EventCategory category, Pageable pageable) {
+        log.info("Fetching events for category: {}", category);
+
+        LocalDate today = LocalDate.now();
+        Page<Event> events = eventRepository.findEventsByCategory(category, today, pageable);
+
+        return events.map(eventMapper::toSummaryDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> getNearbyEvents(Double lat, Double lon, Double radiusKm, Pageable pageable) {
+        log.info("Fetching events near coordinates: lat={}, lon={}, radius={}km", lat, lon, radiusKm);
+
+        if (lat < -90 || lat > 90) {
+            throw new IllegalArgumentException("Latitude must be between -90 and 90");
+        }
+        if (lon < -180 || lon > 180) {
+            throw new IllegalArgumentException("Longitude must be between -180 and 180");
+        }
+        if (radiusKm <= 0) {
+            throw new IllegalArgumentException("Radius must be greater than 0");
+        }
+
+        LocalDate today = LocalDate.now();
+        List<Event> events = eventRepository.findNearbyEvents(lat, lon, radiusKm, today);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), events.size());
+
+        List<EventSummaryDto> pagedEvents = events.subList(start, end)
+                .stream()
+                .map(eventMapper::toSummaryDto)
+                .toList();
+
+        return new org.springframework.data.domain.PageImpl<>(
+                pagedEvents,
+                pageable,
+                events.size());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventSummaryDto> searchEvents(String city, EventCategory category, LocalDate startDate,
+            LocalDate endDate, Pageable pageable) {
+        log.info("Searching events with filters - city: {}, category: {}, startDate: {}, endDate: {}",
+                city, category, startDate, endDate);
+
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new InvalidDateRangeException("Start date must be before or equal to end date");
+        }
+
+        Page<Event> events = eventRepository.searchEvents(city, category, startDate, endDate, pageable);
+
+        return events.map(eventMapper::toSummaryDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public EventDto getEventById(Long id) {
+        log.info("Fetching event with id: {}", id);
+
+        Event event = eventRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+
+        return eventMapper.toDto(event);
+    }
+}
