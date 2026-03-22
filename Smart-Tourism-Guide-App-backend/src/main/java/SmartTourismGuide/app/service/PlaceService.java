@@ -26,4 +26,13 @@ public interface PlaceService {
     Page<PlaceDetailsDto> getAllPlaces(int page, int size, boolean includeDeleted);
 
     PlaceDetailsDto restorePlace(Long placeId);
+
+    // ── User submission & admin moderation ──────────────────────────────────
+    PlaceDetailsDto submitPlace(Long userId, CreatePlaceDto dto);
+
+    org.springframework.data.domain.Page<PlaceDetailsDto> getPendingPlaces(int page, int size);
+
+    PlaceDetailsDto verifyPlace(Long placeId);
+
+    void rejectPlace(Long placeId);
 }

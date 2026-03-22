@@ -201,17 +201,21 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     protected void updatePlaceRating(Long placeId) {
-        List<Object> stats = reviewRepository.getPlaceRatingStats(placeId);
+        // countByPlaceIdAndDeletedFalse is a simple derived query — guaranteed reliable
+        Long reviewCount = reviewRepository.countByPlaceIdAndDeletedFalse(placeId);
 
+        // getPlaceRatingStats returns List<Object[]> at runtime (one Object[] row per
+        // result).
+        // The old code checked stats.size() >= 2 which was always FALSE (size == 1).
         Double avgRating = 0.0;
-        Long reviewCount = 0L;
-
-        if (stats != null && stats.size() >= 2) {
-            if (stats.get(0) != null) {
-                avgRating = ((Number) stats.get(0)).doubleValue();
-            }
-            if (stats.get(1) != null) {
-                reviewCount = ((Number) stats.get(1)).longValue();
+        List<Object> stats = reviewRepository.getPlaceRatingStats(placeId);
+        if (stats != null && !stats.isEmpty()) {
+            Object first = stats.get(0);
+            if (first instanceof Object[] row) {
+                if (row[0] != null)
+                    avgRating = ((Number) row[0]).doubleValue();
+            } else if (first instanceof Number n) {
+                avgRating = n.doubleValue();
             }
         }
 

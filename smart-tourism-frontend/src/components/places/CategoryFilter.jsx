@@ -1,13 +1,18 @@
-import { Landmark, Trees, Church, Mountain, Palette, Waves } from 'lucide-react';
+import { Building2, Landmark, Church, Trees, Waves, Utensils, Bike, Coffee, Mountain, Ticket } from 'lucide-react';
 
 const categories = [
-    { id: null, name: 'All Places', icon: null },
-    { id: 'HISTORICAL', name: 'Historical', icon: Landmark },
-    { id: 'NATURAL', name: 'Natural', icon: Trees },
-    { id: 'RELIGIOUS', name: 'Religious', icon: Church },
-    { id: 'ADVENTURE', name: 'Adventure', icon: Mountain },
-    { id: 'CULTURAL', name: 'Cultural', icon: Palette },
-    { id: 'BEACH', name: 'Beach', icon: Waves },
+    { id: null, label: 'All Places', icon: null },
+    { id: 'ATTRACTION', label: 'Attractions', icon: Ticket },
+    { id: 'HISTORICAL_SITE', label: 'Historical', icon: Landmark },
+    { id: 'RELIGIOUS_SITE', label: 'Religious', icon: Church },
+    { id: 'PARK', label: 'Parks', icon: Trees },
+    { id: 'BEACH', label: 'Beach', icon: Waves },
+    { id: 'MOUNTAIN', label: 'Mountains', icon: Mountain },
+    { id: 'TREK', label: 'Trekking', icon: Mountain },
+    { id: 'MUSEUM', label: 'Museums', icon: Ticket },
+    { id: 'ADVENTURE_ACTIVITY', label: 'Adventure', icon: Bike },
+    { id: 'RESTAURANT', label: 'Restaurants', icon: Utensils },
+    { id: 'CAFE', label: 'Cafes', icon: Coffee },
 ];
 
 export default function CategoryFilter({ activeCategory, onCategoryChange }) {
@@ -33,7 +38,7 @@ export default function CategoryFilter({ activeCategory, onCategoryChange }) {
                                 `}
                             >
                                 {Icon && <Icon className="w-4 h-4" />}
-                                {category.name}
+                                {category.label}
                             </button>
                         );
                     })}

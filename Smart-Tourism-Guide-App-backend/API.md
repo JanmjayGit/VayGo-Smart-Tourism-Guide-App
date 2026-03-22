@@ -45,14 +45,48 @@ http://localhost:8080
 
 ## HOTELS & ACCOMMODATIONS
 
-🌐 GET    /api/hotels/search        - Advanced search with filters
-🌐 GET    /api/hotels/nearby        - Location-based search
-🌐 GET    /api/hotels/{id}          - Get hotel details
-👑 POST   /api/admin/hotels         - Create hotel (ADMIN)
-👑 PUT    /api/admin/hotels/{id}    - Update hotel (ADMIN)
-👑 DELETE /api/admin/hotels/{id}    - Soft delete (ADMIN)
+🌐 GET    /api/hotels/search                    - Advanced search (city, price, rating, location)
+🌐 GET    /api/hotels/nearby                    - Location-based search (lat, lon, radius)
+🌐 GET    /api/hotels/{id}                      - Get hotel details with imageUrls + amenities
+🌐 GET    /api/hotels/city/{city}               - Get hotels by city
+🌐 GET    /api/hotels/price                     - Filter by price range
+🌐 GET    /api/bookings/hotels/{hotelId}/rooms   - Get room types & availability for a hotel
+👑 POST   /api/admin/hotels                     - Create hotel (ADMIN)
+👑 PUT    /api/admin/hotels/{id}                - Update hotel (ADMIN)
+👑 DELETE /api/admin/hotels/{id}               - Soft delete hotel (ADMIN)
+👑 POST   /api/admin/hotels/{hotelId}/rooms     - Add room type to hotel (ADMIN)
+👑 GET    /api/admin/hotels/unverified          - List user-submitted hotels awaiting review (ADMIN)
+👑 PATCH  /api/admin/hotels/{id}/verify         - Approve hotel submission (ADMIN)
+👑 DELETE /api/admin/hotels/{id}/reject         - Reject & delete hotel submission (ADMIN)
 
 ---
+
+## BOOKINGS
+
+🔒 POST   /api/bookings                         - Create booking (auto-confirms + marks PAID)
+🔒 GET    /api/bookings/my                      - Get current user's bookings
+🔒 DELETE /api/bookings/{id}/cancel             - Cancel booking (refunds if future check-in)
+
+### Booking Request Body
+```json
+{
+  "hotelId": 1,
+  "roomId": 3,
+  "checkIn": "2025-04-10",
+  "checkOut": "2025-04-14",
+  "guests": 2
+}
+```
+
+### Booking Status Values
+- `PENDING` → `CONFIRMED` → `COMPLETED`
+- `CANCELLED` (with `REFUNDED` payment status)
+
+### Room Types
+- `STANDARD`, `DELUXE`, `SUITE`, `FAMILY`
+
+### Payment Status
+- `UNPAID` → `PAID` → `REFUNDED`
 
 ## RESTAURANTS & FOOD
 

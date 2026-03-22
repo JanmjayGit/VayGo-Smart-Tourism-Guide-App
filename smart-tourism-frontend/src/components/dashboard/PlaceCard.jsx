@@ -40,18 +40,21 @@ export default function PlaceCard({ place, onToggleFavorite }) {
                 <img
                     src={place.imageUrl || '/placeholder-place.jpg'}
                     alt={place.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                 />
                 {/* Favorite Button */}
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 right-2 bg-white/90 hover:bg-white rounded-full"
                     onClick={handleFavoriteClick}
                     disabled={isLoading}
+                    className="absolute top-3 right-3 p-0 bg-transparent hover:bg-transparent focus-visible:ring-0 transition-all duration-200 hover:scale-110 active:scale-95"
                 >
                     <Heart
-                        className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                        strokeWidth={1.5}
+                        className={`w-7 h-7 drop-shadow-md transition-all duration-200 ${isFavorite
+                            ? "fill-[#FF385C] stroke-[#FF385C]"
+                            : "stroke-white fill-black/40"
                             }`}
                     />
                 </Button>
@@ -66,7 +69,7 @@ export default function PlaceCard({ place, onToggleFavorite }) {
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <Star className="h-4 w-4 fill-black" />
                         <span className="font-medium">{place.rating || '4.5'}</span>
                     </div>
                     <span className="text-sm text-gray-500">

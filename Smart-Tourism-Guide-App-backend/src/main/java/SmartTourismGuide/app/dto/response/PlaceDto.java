@@ -17,10 +17,13 @@ public class PlaceDto {
     private String name;
     private PlaceCategory category;
     private BigDecimal latitude;
+    private String description; // new
     private BigDecimal longitude;
     private Double distance; // Calculated distance in km
     private BigDecimal rating;
     private String imageUrl;
     private Integer priceRange;
     private String address;
+    private String city;
+    private Long reviewCount; // populated from place.popularity (review count stored there)
 }

@@ -1,6 +1,7 @@
 package SmartTourismGuide.app.entity;
 
 import SmartTourismGuide.app.enums.PlaceCategory;
+import SmartTourismGuide.app.enums.PlaceStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "places", indexes = {
@@ -38,12 +41,12 @@ public class Place {
     @Size(max = 200)
     private String name;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 30)
     private PlaceCategory category;
 
     @NotNull
@@ -72,6 +75,12 @@ public class Place {
 
     @Size(max = 500)
     private String imageUrl;
+
+    // Multiple photo URLs — stored in a separate join table
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "place_photos", joinColumns = @JoinColumn(name = "place_id"))
+    @Column(name = "photo_url", length = 1000)
+    private List<String> imageUrls = new ArrayList<>();
 
     @Size(max = 100)
     private String contactInfo;
@@ -108,6 +117,17 @@ public class Place {
 
     @Column(columnDefinition = "TEXT")
     private String popularDishes; // JSON array: ["Biryani", "Butter Chicken", "Naan"]
+
+    // Hotel verification — admin-added = true, user-submitted = false until
+    // approved
+    @Column(nullable = false)
+    private Boolean verified = true;
+
+    // If user submitted this hotel, track who submitted it
+    private Long submittedByUserId;
+
+    @Enumerated(EnumType.STRING)
+    private PlaceStatus status = PlaceStatus.PENDING;
 
     // Soft delete fields
     @Column(nullable = false)

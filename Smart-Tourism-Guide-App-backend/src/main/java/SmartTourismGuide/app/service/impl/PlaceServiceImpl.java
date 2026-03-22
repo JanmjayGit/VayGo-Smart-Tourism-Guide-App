@@ -179,8 +179,12 @@ public class PlaceServiceImpl implements PlaceService {
                 place.setLongitude(createDto.getLongitude());
                 place.setAddress(createDto.getAddress());
                 place.setRating(createDto.getRating());
-                place.setPopularity(0L); // Initialize to 0
+                place.setPopularity(0L);
                 place.setImageUrl(createDto.getImageUrl());
+                if (createDto.getImageUrls() != null && !createDto.getImageUrls().isEmpty()) {
+                        place.setImageUrls(createDto.getImageUrls());
+                }
+                place.setCity(createDto.getCity());
                 place.setContactInfo(createDto.getContactInfo());
                 place.setOpeningHours(createDto.getOpeningHours());
                 place.setPriceRange(createDto.getPriceRange());
@@ -219,6 +223,12 @@ public class PlaceServiceImpl implements PlaceService {
                 }
                 if (updateDto.getImageUrl() != null) {
                         place.setImageUrl(updateDto.getImageUrl());
+                }
+                if (updateDto.getImageUrls() != null) {
+                        place.setImageUrls(updateDto.getImageUrls());
+                }
+                if (updateDto.getCity() != null) {
+                        place.setCity(updateDto.getCity());
                 }
                 if (updateDto.getContactInfo() != null) {
                         place.setContactInfo(updateDto.getContactInfo());
@@ -278,5 +288,62 @@ public class PlaceServiceImpl implements PlaceService {
                 place.setDeletedAt(null);
                 Place restoredPlace = placeRepository.save(place);
                 return PlaceMapper.toPlaceDetailsDto(restoredPlace);
+        }
+
+        // User sbmit places
+        @Override
+        @Transactional
+        public PlaceDetailsDto submitPlace(Long userId, CreatePlaceDto dto) {
+                Place place = new Place();
+                place.setName(dto.getName());
+                place.setDescription(dto.getDescription());
+                place.setCategory(dto.getCategory());
+                place.setLatitude(dto.getLatitude());
+                place.setLongitude(dto.getLongitude());
+                place.setAddress(dto.getAddress());
+                place.setRating(dto.getRating() != null ? dto.getRating() : BigDecimal.ZERO);
+                place.setPopularity(0L);
+                place.setImageUrl(dto.getImageUrl());
+                if (dto.getImageUrls() != null && !dto.getImageUrls().isEmpty()) {
+                        place.setImageUrls(dto.getImageUrls());
+                }
+                place.setCity(dto.getCity());
+                place.setContactInfo(dto.getContactInfo());
+                place.setOpeningHours(dto.getOpeningHours());
+                place.setPriceRange(dto.getPriceRange());
+                // Mark as PENDING — awaiting admin review
+                place.setVerified(false);
+                place.setSubmittedByUserId(userId);
+                return PlaceMapper.toPlaceDetailsDto(placeRepository.save(place));
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public Page<PlaceDetailsDto> getPendingPlaces(int page, int size) {
+                Pageable pageable = PageRequest.of(page, size);
+                // Only return places awaiting verification (verified=false, not deleted)
+                return placeRepository.findByVerifiedFalseAndDeletedFalse(pageable)
+                                .map(PlaceMapper::toPlaceDetailsDto);
+        }
+
+        @Override
+        @Transactional
+        public PlaceDetailsDto verifyPlace(Long placeId) {
+                Place place = placeRepository.findById(placeId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Place", "id", placeId));
+                if (place.getDeleted()) {
+                        throw new IllegalStateException("Cannot verify a deleted place");
+                }
+                place.setVerified(true);
+                return PlaceMapper.toPlaceDetailsDto(placeRepository.save(place));
+        }
+
+        @Override
+        public void rejectPlace(Long placeId) {
+                Place place = placeRepository.findById(placeId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Place", "id", placeId));
+                place.setDeleted(true);
+                place.setDeletedAt(java.time.LocalDateTime.now());
+                placeRepository.save(place);
         }
 }

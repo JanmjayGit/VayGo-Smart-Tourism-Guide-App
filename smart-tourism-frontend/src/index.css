@@ -1,10 +1,6 @@
-/* ============================================
-   LUXURY TRAVEL EDITORIAL DESIGN SYSTEM
-   Following frontend-design skill principles
-   ============================================ */
-
 /* Google Fonts Import - Distinctive Typography */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -103,9 +99,9 @@
   --destructive: #B85D48;
 
   /* Borders & Inputs */
-  --border: #D4C4B0;
-  --input: #E8DFD0;
-  --ring: #D4745F;
+  --border: #C8C8C8;
+  --input: #C8C8C8;
+  --ring: #C8C8C8;
 
   /* Charts: Warm Palette */
   --chart-1: #D4745F;
@@ -176,7 +172,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-body);
+    font-family: 'Inter Tight', sans-serif;
     font-weight: 400;
     line-height: 1.7;
     letter-spacing: -0.01em;
@@ -191,7 +187,7 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-display);
+    font-family: 'Inter Tight', sans-serif;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.02em;
@@ -386,5 +382,13 @@
       0 4px 8px rgba(44, 51, 51, 0.06),
       0 12px 24px rgba(44, 51, 51, 0.1),
       0 24px 48px rgba(44, 51, 51, 0.08);
+  }
+}
+
+/* Add to your global CSS */
+@supports (backdrop-filter: blur(40px)) {
+  .glass-effect {
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
   }
 }

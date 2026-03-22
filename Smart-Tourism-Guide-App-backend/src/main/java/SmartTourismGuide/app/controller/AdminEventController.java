@@ -7,6 +7,7 @@ import SmartTourismGuide.app.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,5 +50,28 @@ public class AdminEventController {
         log.info("Admin restoring event: {}", id);
         eventService.restoreEvent(id);
         return ResponseEntity.ok().build();
+    }
+
+    // ── Moderation endpoints ────────────────────────────────────────────────────
+
+    @GetMapping("/pending")
+    public ResponseEntity<Page<EventDto>> getPendingEvents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        log.info("Admin listing pending events");
+        return ResponseEntity.ok(eventService.getPendingEvents(page, size));
+    }
+
+    @PatchMapping("/{id}/verify")
+    public ResponseEntity<EventDto> verifyEvent(@PathVariable Long id) {
+        log.info("Admin verifying event id: {}", id);
+        return ResponseEntity.ok(eventService.verifyEvent(id));
+    }
+
+    @DeleteMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectEvent(@PathVariable Long id) {
+        log.info("Admin rejecting event id: {}", id);
+        eventService.rejectEvent(id);
+        return ResponseEntity.noContent().build();
     }
 }

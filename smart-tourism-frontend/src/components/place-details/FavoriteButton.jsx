@@ -47,14 +47,23 @@ export default function FavoriteButton({ placeId, initialIsFavorite = false, siz
 
     return (
         <Button
-            variant={isFavorite ? 'default' : 'outline'}
-            size={size}
             onClick={toggleFavorite}
             disabled={isLoading}
-            className={isFavorite ? 'bg-red-500 hover:bg-red-600' : ''}
+            className={`flex items-center rounded-full px-5 py-2 font-semibold
+    transition-all duration-200 shadow-sm
+    ${isFavorite
+                    ? "bg-[#FF385C] hover:bg-[#e03150] text-white"
+                    : "bg-white border border-gray-300 text-gray-800 hover:border-black hover:text-black"
+                }`}
         >
-            <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
-            <span className="ml-2">{isFavorite ? 'Saved' : 'Save'}</span>
+            <Heart
+                strokeWidth={2.2}
+                className={`h-5 w-5 transition-all ${isFavorite
+                        ? "fill-white stroke-white"
+                        : "stroke-current fill-transparent"
+                    }`}
+            />
+            <span className="ml-2">{isFavorite ? "Saved" : "Save"}</span>
         </Button>
     );
 }

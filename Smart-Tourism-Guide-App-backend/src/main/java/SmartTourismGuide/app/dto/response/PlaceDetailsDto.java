@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,7 +24,10 @@ public class PlaceDetailsDto {
     private String address;
     private BigDecimal rating;
     private Long popularity;
+    private Long reviewCount; // == popularity; kept as separate named field for frontend
     private String imageUrl;
+    private List<String> imageUrls;
+    private String city;
     private String contactInfo;
     private String openingHours;
     private Integer priceRange;

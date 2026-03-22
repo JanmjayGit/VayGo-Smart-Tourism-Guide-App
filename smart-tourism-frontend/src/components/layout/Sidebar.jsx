@@ -10,6 +10,8 @@ import {
     Siren,
     Shield,
     Users,
+    MessageSquare,
+    Bell,
     Settings as SettingsIcon
 } from 'lucide-react';
 
@@ -28,13 +30,16 @@ export default function Sidebar() {
     ];
 
     const adminNavItems = [
-        { path: '/admin', label: 'Admin Dashboard', icon: Shield },
+        { path: '/admin', label: 'Admin Panel', icon: Shield },
         { path: '/admin/places', label: 'Manage Places', icon: MapPin },
         { path: '/admin/events', label: 'Manage Events', icon: Calendar },
+        { path: '/admin/reviews', label: 'Moderate Reviews', icon: MessageSquare },
+        { path: '/admin/emergency', label: 'Emergency Mgmt', icon: Siren },
+        { path: '/admin/notifications', label: 'Notifications', icon: Bell },
         { path: '/admin/users', label: 'Manage Users', icon: Users },
     ];
 
-    const isAdmin = user?.role === 'ADMIN';
+    const isAdmin = user?.role === 'ROLE_ADMIN' || user?.roles?.includes('ROLE_ADMIN');
 
     return (
         <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r bg-white hidden">

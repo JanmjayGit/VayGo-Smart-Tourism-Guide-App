@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function ImageCarousel({ images = [] }) {
+export default function ImageCarousel({ images = [], placeName = '' }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
     // Handle no images case
     if (!images || images.length === 0) {
         return (
-            <div className="relative w-full h-96 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center">
+            <div className="relative w-full h-96 bg-linear-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center">
                 <p className="text-gray-500">No images available</p>
             </div>
         );
@@ -34,7 +34,7 @@ export default function ImageCarousel({ images = [] }) {
                 {/* Current Image */}
                 <img
                     src={images[currentIndex]}
-                    alt={`Place image ${currentIndex + 1}`}
+                    alt={placeName ? `${placeName} – Photo ${currentIndex + 1} of ${images.length}` : `Photo ${currentIndex + 1}`}
                     className="w-full h-full object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
                     onClick={() => setIsLightboxOpen(true)}
                 />
@@ -75,8 +75,8 @@ export default function ImageCarousel({ images = [] }) {
                                 key={index}
                                 onClick={() => goToSlide(index)}
                                 className={`w-2 h-2 rounded-full transition-all ${index === currentIndex
-                                        ? 'bg-white w-8'
-                                        : 'bg-white/50 hover:bg-white/75'
+                                    ? 'bg-white w-8'
+                                    : 'bg-white/50 hover:bg-white/75'
                                     }`}
                                 aria-label={`Go to image ${index + 1}`}
                             />
@@ -99,7 +99,7 @@ export default function ImageCarousel({ images = [] }) {
 
                     <img
                         src={images[currentIndex]}
-                        alt={`Place image ${currentIndex + 1}`}
+                        alt={placeName ? `${placeName} – Photo ${currentIndex + 1} of ${images.length}` : `Photo ${currentIndex + 1}`}
                         className="max-w-full max-h-full object-contain"
                     />
 

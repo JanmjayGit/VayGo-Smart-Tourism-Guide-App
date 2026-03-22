@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,7 +26,9 @@ public class EventDto implements Serializable {
     private String description;
     private EventCategory category;
     private LocalDate eventDate;
+    private LocalDate endDate;
     private LocalTime eventTime;
+
     private String city;
     private String venue;
     private String address;
@@ -37,6 +40,7 @@ public class EventDto implements Serializable {
     private BigDecimal entryFee;
     private Boolean isFree;
     private String imageUrl;
+    private List<String> imageUrls;
     private String websiteUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

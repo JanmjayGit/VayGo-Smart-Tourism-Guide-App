@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events", indexes = {
@@ -39,11 +41,14 @@ public class Event {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private EventCategory category;
 
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "event_time")
     private LocalTime eventTime;
@@ -81,12 +86,26 @@ public class Event {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<EventImage> images = new ArrayList<>();
+
     @Column(name = "website_url", length = 500)
     private String websiteUrl;
 
     @Column(nullable = false)
     @lombok.Builder.Default
     private Boolean deleted = false;
+
+    // ── User submission & moderation ─────────────────────────────────────────
+    /** true = visible publicly; false = awaiting admin review */
+    @Column(nullable = false)
+    @lombok.Builder.Default
+    private Boolean verified = true;
+
+    /** ID of the user who submitted this event (null if admin-created) */
+    @Column(name = "submitted_by_user_id")
+    private Long submittedByUserId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

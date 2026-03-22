@@ -1,9 +1,12 @@
 package SmartTourismGuide.app.controller;
 
+import SmartTourismGuide.app.dto.request.CreateEventRequest;
 import SmartTourismGuide.app.dto.response.EventDto;
 import SmartTourismGuide.app.dto.response.EventSummaryDto;
 import SmartTourismGuide.app.enums.EventCategory;
+import SmartTourismGuide.app.security.services.UserDetailsImpl;
 import SmartTourismGuide.app.service.EventService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,7 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -132,5 +138,17 @@ public class EventController {
         Page<EventSummaryDto> events = eventService.getEventsByDateRange(startDate, endDate, pageable);
 
         return ResponseEntity.ok(events);
+    }
+
+    // ── User submission ────────────────────────────────────────────────────
+
+    @PostMapping("/submit")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<EventDto> submitEvent(
+            @Valid @RequestBody CreateEventRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("User {} submitting event: {}", userDetails.getId(), request.getName());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(eventService.submitEvent(userDetails.getId(), request));
     }
 }

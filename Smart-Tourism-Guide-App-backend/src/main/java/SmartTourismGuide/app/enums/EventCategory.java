@@ -6,7 +6,8 @@ public enum EventCategory {
     EXHIBITION("Exhibition"),
     CONCERT("Concert/Music"),
     SPORTS("Sports Event"),
-    OTHER("Other");
+    OTHER("Other"),
+    RELIGIOUS("Religious");
 
     private final String description;
 

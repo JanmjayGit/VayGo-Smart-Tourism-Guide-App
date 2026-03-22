@@ -9,18 +9,23 @@ export const useNotifications = () => {
     const [error, setError] = useState(null);
 
     const fetchNotifications = async () => {
+        const token = localStorage.getItem('token');
+        // Don't fetch if no JWT is present — avoids 401 on unauthenticated renders
+        if (!token) return;
+
         try {
             setLoading(true);
             setError(null);
-            const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
             const [allNotifs, unreadNotifs] = await Promise.all([
                 axios.get(apiEndpoints.GET_NOTIFICATIONS, { headers }),
                 axios.get(apiEndpoints.UNREAD_NOTIFICATIONS, { headers })
             ]);
-            setNotifications(allNotifs.data);
-            setUnreadCount(unreadNotifs.data.length);
+            const allData = allNotifs.data?.content || allNotifs.data || [];
+            setNotifications(Array.isArray(allData) ? allData : []);
+            const unreadData = unreadNotifs.data?.content || unreadNotifs.data || [];
+            setUnreadCount(Array.isArray(unreadData) ? unreadData.length : 0);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to fetch notifications');
         } finally {
@@ -31,6 +36,7 @@ export const useNotifications = () => {
     useEffect(() => {
         fetchNotifications();
     }, []);
+
 
     const markAsRead = async (id) => {
         try {

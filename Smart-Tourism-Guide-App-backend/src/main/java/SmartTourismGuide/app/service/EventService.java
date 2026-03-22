@@ -36,4 +36,13 @@ public interface EventService {
             Pageable pageable);
 
     EventDto getEventById(Long id);
+
+    // ── User submission & admin moderation ───────────────────────────────────
+    EventDto submitEvent(Long userId, CreateEventRequest request);
+
+    Page<EventDto> getPendingEvents(int page, int size);
+
+    EventDto verifyEvent(Long id);
+
+    void rejectEvent(Long id);
 }

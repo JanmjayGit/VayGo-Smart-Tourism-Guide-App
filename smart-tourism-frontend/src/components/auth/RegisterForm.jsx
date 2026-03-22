@@ -97,11 +97,11 @@ export default function RegisterForm() {
     };
 
     return (
-        <Card className="w-full max-w-md mx-auto shadow-lg">
+        <Card className="w-full max-w-md mx-auto shadow-lg border-none ">
             <CardHeader className="space-y-1">
                 <CardTitle className="text-3xl font-bold text-center">Create Account</CardTitle>
                 <CardDescription className="text-center">
-                    Join TravelBuddy today
+                    Join VayGo today
                 </CardDescription>
             </CardHeader>
 
@@ -217,7 +217,7 @@ export default function RegisterForm() {
 
                     {/* API Error */}
                     {apiError && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                        <div className="p-3 bg-red-50 border border-red-00 rounded-md">
                             <p className="text-sm text-red-600">
                                 {apiError}
                             </p>
@@ -227,7 +227,7 @@ export default function RegisterForm() {
                     {/* Submit Button */}
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                         disabled={loading}
                     >
                         {loading ? (
@@ -241,10 +241,10 @@ export default function RegisterForm() {
                 </form>
             </CardContent>
 
-            <CardFooter className="flex justify-center border-t pt-4">
+            <CardFooter className="flex justify-center border-none pt-4">
                 <p className="text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-blue-600 hover:underline font-medium">
+                    <Link to="/login" className="text-teal-600 hover:underline font-medium">
                         Sign in
                     </Link>
                 </p>

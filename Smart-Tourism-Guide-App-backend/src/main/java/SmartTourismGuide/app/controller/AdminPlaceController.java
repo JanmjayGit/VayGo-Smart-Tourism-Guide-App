@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/admin/places")
@@ -37,7 +36,6 @@ public class AdminPlaceController {
         return ResponseEntity.ok(updatedPlace);
     }
 
-
     @DeleteMapping("/{placeId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePlace(@PathVariable Long placeId) {
@@ -45,14 +43,12 @@ public class AdminPlaceController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{placeId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlaceDetailsDto> getPlaceById(@PathVariable Long placeId) {
         PlaceDetailsDto place = placeService.getPlaceById(placeId);
         return ResponseEntity.ok(place);
     }
-
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -64,11 +60,33 @@ public class AdminPlaceController {
         return ResponseEntity.ok(places);
     }
 
-
     @PutMapping("/{placeId}/restore")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlaceDetailsDto> restorePlace(@PathVariable Long placeId) {
         PlaceDetailsDto restoredPlace = placeService.restorePlace(placeId);
         return ResponseEntity.ok(restoredPlace);
+    }
+
+    // ── Moderation ─────────────────────────────────────────────────────
+
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<PlaceDetailsDto>> getPendingPlaces(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(placeService.getPendingPlaces(page, size));
+    }
+
+    @PatchMapping("/{placeId}/verify")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PlaceDetailsDto> verifyPlace(@PathVariable Long placeId) {
+        return ResponseEntity.ok(placeService.verifyPlace(placeId));
+    }
+
+    @DeleteMapping("/{placeId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> rejectPlace(@PathVariable Long placeId) {
+        placeService.rejectPlace(placeId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             setIsAuthenticated(true);
 
-            return { success: true };
+            return { success: true, user: userData };
         } catch (error) {
             return {
                 success: false,
@@ -86,6 +86,13 @@ export const AuthProvider = ({ children }) => {
         return user?.role === 'ROLE_ADMIN' || user?.roles?.includes('ROLE_ADMIN');
     };
 
+    // Update user in state + localStorage (called after profile/settings save)
+    const updateUser = (updatedFields) => {
+        const merged = { ...user, ...updatedFields };
+        localStorage.setItem('user', JSON.stringify(merged));
+        setUser(merged);
+    };
+
     const value = {
         user,
         loading,
@@ -94,6 +101,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         isAdmin,
+        updateUser,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

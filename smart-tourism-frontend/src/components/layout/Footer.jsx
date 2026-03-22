@@ -1,116 +1,101 @@
 import { Link } from 'react-router-dom';
-import { Separator } from '@/components/ui/separator';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone } from 'lucide-react';
+import { MapPin, Globe, Mail, Phone, Twitter, Instagram, Facebook } from 'lucide-react';
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear();
-
     return (
-        <footer className="border-t bg-gray-50 mt-auto">
-            <div className="w-full px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {/* Brand Section */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-teal-600">TravelBuddy</h3>
-                        <p className="text-sm text-gray-600">
-                            Discover amazing destinations and create unforgettable memories with our comprehensive tourism platform.
+        <footer className="bg-[#0f2d3d] text-white mt-8">
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-14">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+                    {/* Brand */}
+                    <div>
+                        <h2 className="text-2xl font-bold mb-3" >
+                            Vay<span className="text-teal-400">Go</span>
+                        </h2>
+                        <p className="text-white/60 text-sm leading-relaxed">
+                            Discover amazing destinations, plan unforgettable trips, and explore the world with confidence.
                         </p>
-                        {/* Social Media Icons */}
-                        <div className="flex space-x-4">
-                            <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                                <Facebook className="h-5 w-5" />
+                        <div className="flex items-center gap-3 mt-5">
+                            <a href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-teal-500 flex items-center justify-center transition-colors">
+                                <Twitter className="w-4 h-4" />
                             </a>
-                            <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                                <Twitter className="h-5 w-5" />
+                            <a href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-teal-500 flex items-center justify-center transition-colors">
+                                <Instagram className="w-4 h-4" />
                             </a>
-                            <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                                <Instagram className="h-5 w-5" />
-                            </a>
-                            <a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">
-                                <Linkedin className="h-5 w-5" />
+                            <a href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-teal-500 flex items-center justify-center transition-colors">
+                                <Facebook className="w-4 h-4" />
                             </a>
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-900">Quick Links</h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link to="/about" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    About Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/places" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Places
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/events" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Events
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/emergency" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Emergency Services
-                                </Link>
-                            </li>
+                    {/* Explore */}
+                    <div>
+                        <h3 className="font-bold text-sm uppercase tracking-widest text-teal-400 mb-4">Explore</h3>
+                        <ul className="space-y-2.5">
+                            {[
+                                { label: 'Places', path: '/places' },
+                                { label: 'Events', path: '/events' },
+                                { label: 'Hotels', path: '/hotels' },
+                                { label: 'Favorites', path: '/favorites' },
+                                { label: 'Map', path: '/map' },
+                                { label: 'Weather', path: '/weather' },
+                            ].map(link => (
+                                <li key={link.path}>
+                                    <Link to={link.path} className="text-white/60 hover:text-white text-sm transition-colors">
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Support */}
-                    <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-900">Support</h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link to="/help" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Help Center
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/contact" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Contact Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/privacy" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Privacy Policy
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/terms" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">
-                                    Terms of Service
-                                </Link>
-                            </li>
+                    {/* Safety */}
+                    <div>
+                        <h3 className="font-bold text-sm uppercase tracking-widest text-teal-400 mb-4">Safety</h3>
+                        <ul className="space-y-2.5">
+                            {[
+                                { label: 'Emergency Services', path: '/emergency' },
+                                { label: 'Travel Alerts', path: '/weather' },
+                                { label: 'Safe Travel Tips', path: '#' },
+                                { label: 'Contact Authorities', path: '#' },
+                            ].map(link => (
+                                <li key={link.label}>
+                                    <Link to={link.path} className="text-white/60 hover:text-white text-sm transition-colors">
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Contact Info */}
-                    <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-gray-900">Contact</h4>
-                        <ul className="space-y-2">
-                            <li className="flex items-center gap-2 text-sm text-gray-600">
-                                <Mail className="h-4 w-4" />
-                                <a href="mailto:support@smarttourism.com" className="hover:text-teal-600 transition-colors">
-                                    support@smarttourism.com
-                                </a>
+                    {/* Contact */}
+                    <div>
+                        <h3 className="font-bold text-sm uppercase tracking-widest text-teal-400 mb-4">Contact</h3>
+                        <ul className="space-y-3">
+                            <li className="flex items-center gap-3 text-white/60 text-sm">
+                                <MapPin className="w-4 h-4 text-teal-400 shrink-0" /> Punjab, India
                             </li>
-                            <li className="flex items-center gap-2 text-sm text-gray-600">
-                                <Phone className="h-4 w-4" />
-                                <a href="tel:+1234567890" className="hover:text-teal-600 transition-colors">
-                                    +1 (234) 567-890
-                                </a>
+                            <li className="flex items-center gap-3 text-white/60 text-sm">
+                                <Mail className="w-4 h-4 text-teal-400 shrink-0" /> support@vaygo.in
+                            </li>
+                            <li className="flex items-center gap-3 text-white/60 text-sm">
+                                <Phone className="w-4 h-4 text-teal-400 shrink-0" /> +91 98765 43210
+                            </li>
+                            <li className="flex items-center gap-3 text-white/60 text-sm">
+                                <Globe className="w-4 h-4 text-teal-400 shrink-0" /> www.vaygo.in
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <Separator className="my-8" />
-
-                {/* Copyright */}
-                <div className="text-center text-sm text-gray-600">
-                    <p>&copy; {currentYear} TravelBuddy. All rights reserved.</p>
+                {/* Bottom bar */}
+                <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p className="text-white/40 text-md">© {new Date().getFullYear()} VayGo. All rights reserved.</p>
+                    <div className="flex items-center gap-6">
+                        <a href="#" className="text-white/40 hover:text-white/70 text-md transition-colors">Privacy Policy</a>
+                        <a href="#" className="text-white/40 hover:text-white/70 text-md transition-colors">Terms of Use</a>
+                        <a href="#" className="text-white/40 hover:text-white/70 text-md transition-colors">Cookie Policy</a>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -5,6 +5,7 @@ import SmartTourismGuide.app.dto.request.UpdateEventRequest;
 import SmartTourismGuide.app.dto.response.EventDto;
 import SmartTourismGuide.app.dto.response.EventSummaryDto;
 import SmartTourismGuide.app.entity.Event;
+import SmartTourismGuide.app.entity.EventImage;
 import SmartTourismGuide.app.enums.EventCategory;
 import SmartTourismGuide.app.exceptions.EventNotFoundException;
 import SmartTourismGuide.app.exceptions.InvalidDateRangeException;
@@ -35,6 +36,17 @@ public class EventServiceImpl implements EventService {
         log.info("Creating new event: {}", request.getName());
 
         Event event = eventMapper.toEntity(request);
+
+        if (request.getImageUrls() != null) {
+            request.getImageUrls().forEach(url -> {
+                EventImage img = EventImage.builder()
+                        .imageUrl(url)
+                        .event(event)
+                        .build();
+                event.getImages().add(img);
+            });
+        }
+
         Event savedEvent = eventRepository.save(event);
 
         log.info("Event created successfully with id: {}", savedEvent.getId());
@@ -44,15 +56,42 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventDto updateEvent(Long id, UpdateEventRequest request) {
+
         log.info("Updating event with id: {}", id);
 
         Event event = eventRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EventNotFoundException(id));
 
+        // update normal fields
         eventMapper.updateEntity(event, request);
+
+        // Update gallery images
+        if (request.getImageUrls() != null) {
+
+            // remove old images
+            event.getImages().clear();
+
+            // add new images
+            request.getImageUrls().forEach(url -> {
+
+                EventImage img = EventImage.builder()
+                        .imageUrl(url)
+                        .event(event)
+                        .build();
+
+                event.getImages().add(img);
+            });
+
+            // set primary image
+            if (!request.getImageUrls().isEmpty()) {
+                event.setImageUrl(request.getImageUrls().get(0));
+            }
+        }
+
         Event updatedEvent = eventRepository.save(event);
 
         log.info("Event updated successfully: {}", id);
+
         return eventMapper.toDto(updatedEvent);
     }
 
@@ -204,5 +243,63 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new EventNotFoundException(id));
 
         return eventMapper.toDto(event);
+    }
+
+    // ── User submission & admin moderation ───────────────────────────────────
+
+    @Override
+    @Transactional
+    public EventDto submitEvent(Long userId, CreateEventRequest request) {
+
+        log.info("User {} submitting event: {}", userId, request.getName());
+
+        Event event = eventMapper.toEntity(request);
+
+        // Save gallery images
+        if (request.getImageUrls() != null) {
+            request.getImageUrls().forEach(url -> {
+                EventImage img = EventImage.builder()
+                        .imageUrl(url)
+                        .event(event)
+                        .build();
+
+                event.getImages().add(img);
+            });
+        }
+
+        event.setVerified(false);
+        event.setSubmittedByUserId(userId);
+
+        Event saved = eventRepository.save(event);
+
+        return eventMapper.toDto(saved);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<EventDto> getPendingEvents(int page, int size) {
+        log.info("Fetching pending events — page {}", page);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        return eventRepository.findPendingEvents(pageable).map(eventMapper::toDto);
+    }
+
+    @Override
+    @Transactional
+    public EventDto verifyEvent(Long id) {
+        log.info("Verifying event id: {}", id);
+        Event event = eventRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+        event.setVerified(true);
+        return eventMapper.toDto(eventRepository.save(event));
+    }
+
+    @Override
+    @Transactional
+    public void rejectEvent(Long id) {
+        log.info("Rejecting event id: {}", id);
+        Event event = eventRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EventNotFoundException(id));
+        event.setDeleted(true);
+        eventRepository.save(event);
     }
 }

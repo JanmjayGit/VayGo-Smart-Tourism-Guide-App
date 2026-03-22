@@ -36,10 +36,23 @@ export default function EmergencyServices() {
             setLoading(true);
             setError(null);
 
-            const params = selectedCity ? { city: selectedCity } : {};
-            const response = await axios.get(apiEndpoints.EMERGENCY_SERVICES, { params });
+            let response;
+            if (selectedCity) {
+                response = await axios.get(apiEndpoints.EMERGENCY_BY_CITY(selectedCity));
+            } else {
+                // Try nearby with default location (Delhi), or fetch all
+                try {
+                    response = await axios.get(apiEndpoints.NEARBY_EMERGENCY, {
+                        params: { latitude: 28.6139, longitude: 77.2090, radius: 50 }
+                    });
+                } catch {
+                    // Fallback to city-based search
+                    response = await axios.get(apiEndpoints.EMERGENCY_BY_CITY('Delhi'));
+                }
+            }
 
-            setServices(response.data?.content || response.data || []);
+            const data = response.data;
+            setServices(Array.isArray(data) ? data : (data?.content || []));
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to load emergency services');
             toast.error('Failed to load emergency services');

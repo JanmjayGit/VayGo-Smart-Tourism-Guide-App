@@ -3,12 +3,13 @@ package SmartTourismGuide.app.service.impl;
 import SmartTourismGuide.app.dto.request.*;
 import SmartTourismGuide.app.dto.response.*;
 import SmartTourismGuide.app.dto.update.*;
-import SmartTourismGuide.app.entity.Place;
-import SmartTourismGuide.app.enums.PlaceCategory;
+import SmartTourismGuide.app.entity.Hotel;
+import SmartTourismGuide.app.entity.Room;
 import SmartTourismGuide.app.exceptions.ResourceNotFoundException;
 import SmartTourismGuide.app.mapper.HotelMapper;
-import SmartTourismGuide.app.mapper.PlaceMapper;
-import SmartTourismGuide.app.repository.PlaceRepository;
+import SmartTourismGuide.app.repository.HotelRepository;
+import SmartTourismGuide.app.repository.RoomRepository;
+import SmartTourismGuide.app.repository.UserRepository;
 import SmartTourismGuide.app.service.HotelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,155 +20,133 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class HotelServiceImpl implements HotelService {
 
-    private final PlaceRepository placeRepository;
+    private final HotelRepository hotelRepository;
+    private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
 
+    // create Hotel
     @Override
     @Transactional
-    public PlaceDetailsDto createHotel(CreateHotelDto createDto) {
-        Place hotel = new Place();
-        hotel.setName(createDto.getName());
-        hotel.setDescription(createDto.getDescription());
-        hotel.setCategory(PlaceCategory.HOTEL); // Always set to HOTEL
-        hotel.setLatitude(createDto.getLatitude());
-        hotel.setLongitude(createDto.getLongitude());
-        hotel.setCity(createDto.getCity());
-        hotel.setAddress(createDto.getAddress());
-        hotel.setPricePerNight(createDto.getPricePerNight());
-        hotel.setRating(createDto.getRating());
-        hotel.setImageUrl(createDto.getImageUrl());
-        hotel.setContactInfo(createDto.getContactInfo());
-        hotel.setOpeningHours(createDto.getOpeningHours());
-        hotel.setPriceRange(createDto.getPriceRange());
-        hotel.setAmenities(createDto.getAmenities());
-        hotel.setAvailabilityStatus(createDto.getAvailabilityStatus());
-        hotel.setPopularity(0L);
-        hotel.setDeleted(false);
-
-        Place savedHotel = placeRepository.save(hotel);
-        return PlaceMapper.toPlaceDetailsDto(savedHotel);
+    public HotelResponseDto createHotel(CreateHotelDto dto) {
+        Hotel hotel = buildHotelFromDto(dto);
+        hotel.setVerified(true); // admin-created → immediately verified
+        hotel.setAvailabilityStatus(true);
+        Hotel saved = hotelRepository.save(hotel);
+        return withRooms(saved, null);
     }
 
     @Override
     @Transactional
-    public PlaceDetailsDto updateHotel(Long hotelId, UpdateHotelDto updateDto) {
-        Place hotel = placeRepository.findById(hotelId)
+    public HotelResponseDto requestHotel(CreateHotelDto dto) {
+        Hotel hotel = buildHotelFromDto(dto);
+        hotel.setVerified(false); // user-submitted → needs approval
+        hotel.setAvailabilityStatus(false);
+//        hotel.setSubmittedByUserId(userId);
+        Hotel saved = hotelRepository.save(hotel);
+//        return HotelMapper.toHotelResponseDto(saved);
+        return withRooms(saved, null);
+    }
+
+    // update Hotel
+    @Override
+    @Transactional
+    public HotelResponseDto updateHotel(Long hotelId, UpdateHotelDto dto) {
+        Hotel hotel = hotelRepository.findByIdAndDeletedFalse(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel", "id", hotelId));
 
-        // Verify it's actually a hotel
-        if (hotel.getCategory() != PlaceCategory.HOTEL) {
-            throw new IllegalStateException("Place with id " + hotelId + " is not a hotel");
+        if (dto.getName() != null)
+            hotel.setName(dto.getName());
+        if (dto.getDescription() != null)
+            hotel.setDescription(dto.getDescription());
+        if (dto.getCity() != null)
+            hotel.setCity(dto.getCity());
+        if (dto.getAddress() != null)
+            hotel.setAddress(dto.getAddress());
+        if (dto.getLatitude() != null)
+            hotel.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null)
+            hotel.setLongitude(dto.getLongitude());
+        if (dto.getPricePerNight() != null)
+            hotel.setPricePerNight(dto.getPricePerNight());
+        if (dto.getRating() != null)
+            hotel.setRating(dto.getRating());
+        if (dto.getImageUrl() != null)
+            hotel.setImageUrl(dto.getImageUrl());
+        if (dto.getContactInfo() != null)
+            hotel.setContactInfo(dto.getContactInfo());
+        if (dto.getOpeningHours() != null)
+            hotel.setOpeningHours(dto.getOpeningHours());
+        if (dto.getPriceRange() != null)
+            hotel.setPriceRange(dto.getPriceRange() != null
+                    ? dto.getPriceRange().toString()
+                    : null);
+        if (dto.getAmenities() != null)
+            hotel.setAmenities(dto.getAmenities());
+        if (dto.getAvailabilityStatus() != null)
+            hotel.setAvailabilityStatus(dto.getAvailabilityStatus());
+        if (dto.getImageUrls() != null && !dto.getImageUrls().isEmpty()) {
+            hotel.setImageUrls(dto.getImageUrls());
+            hotel.setImageUrl(dto.getImageUrls().get(0)); // primary
         }
 
-        // Update only non-null fields
-        if (updateDto.getName() != null) {
-            hotel.setName(updateDto.getName());
-        }
-        if (updateDto.getDescription() != null) {
-            hotel.setDescription(updateDto.getDescription());
-        }
-        if (updateDto.getLatitude() != null) {
-            hotel.setLatitude(updateDto.getLatitude());
-        }
-        if (updateDto.getLongitude() != null) {
-            hotel.setLongitude(updateDto.getLongitude());
-        }
-        if (updateDto.getCity() != null) {
-            hotel.setCity(updateDto.getCity());
-        }
-        if (updateDto.getAddress() != null) {
-            hotel.setAddress(updateDto.getAddress());
-        }
-        if (updateDto.getPricePerNight() != null) {
-            hotel.setPricePerNight(updateDto.getPricePerNight());
-        }
-        if (updateDto.getRating() != null) {
-            hotel.setRating(updateDto.getRating());
-        }
-        if (updateDto.getImageUrl() != null) {
-            hotel.setImageUrl(updateDto.getImageUrl());
-        }
-        if (updateDto.getContactInfo() != null) {
-            hotel.setContactInfo(updateDto.getContactInfo());
-        }
-        if (updateDto.getOpeningHours() != null) {
-            hotel.setOpeningHours(updateDto.getOpeningHours());
-        }
-        if (updateDto.getPriceRange() != null) {
-            hotel.setPriceRange(updateDto.getPriceRange());
-        }
-        if (updateDto.getAmenities() != null) {
-            hotel.setAmenities(updateDto.getAmenities());
-        }
-        if (updateDto.getAvailabilityStatus() != null) {
-            hotel.setAvailabilityStatus(updateDto.getAvailabilityStatus());
-        }
-
-        Place updatedHotel = placeRepository.save(hotel);
-        return PlaceMapper.toPlaceDetailsDto(updatedHotel);
+        Hotel updated = hotelRepository.save(hotel);
+        return withRooms(updated, null);
     }
+
+    // ─── Delete
 
     @Override
     @Transactional
     public void deleteHotel(Long hotelId) {
-        Place hotel = placeRepository.findById(hotelId)
+        Hotel hotel = hotelRepository.findByIdAndDeletedFalse(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel", "id", hotelId));
-
-        if (hotel.getCategory() != PlaceCategory.HOTEL) {
-            throw new IllegalStateException("Place with id " + hotelId + " is not a hotel");
-        }
-
-        // Soft delete
         hotel.setDeleted(true);
         hotel.setDeletedAt(LocalDateTime.now());
-        placeRepository.save(hotel);
+        hotelRepository.save(hotel);
     }
 
+    // Read (single)
     @Override
     @Transactional(readOnly = true)
     public HotelResponseDto getHotelById(Long hotelId) {
-        Place hotel = placeRepository.findByIdAndDeletedFalse(hotelId)
+        Hotel hotel = hotelRepository.findByIdAndDeletedFalse(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel", "id", hotelId));
-
-        if (hotel.getCategory() != PlaceCategory.HOTEL) {
-            throw new IllegalStateException("Place with id " + hotelId + " is not a hotel");
-        }
-
-        return HotelMapper.toHotelResponseDto(hotel);
+        List<Room> rooms = roomRepository.findByHotelId(hotelId);
+//        return HotelMapper.toHotelResponseDto(hotel, null, rooms);
+        return withRooms(hotel, null);
     }
 
+    //Search Hotels
     @Override
     @Transactional(readOnly = true)
     public Page<HotelResponseDto> searchHotels(HotelSearchRequestDto request) {
-        // If location-based search with coordinates
-        if (request.getLatitude() != null && request.getLongitude() != null && request.getRadius() != null) {
+        if (request.getLatitude() != null && request.getLongitude() != null
+                && request.getRadius() != null) {
             return searchHotelsWithLocation(request);
         }
-
-        // If city-based search
-        if (request.getCity() != null && !request.getCity().trim().isEmpty()) {
+        if (request.getCity() != null && !request.getCity().isBlank()) {
             return searchHotelsByCity(request);
         }
-
-        // If price range only
         if (request.getMinPrice() != null || request.getMaxPrice() != null) {
             return searchHotelsByPrice(request);
         }
-
-        // If rating filter only
         if (request.getMinRating() != null) {
             return searchHotelsByRating(request);
         }
+        // Default: all available verified hotels
+        Pageable p = PageRequest.of(request.getPage(), request.getSize());
+        Boolean available = request.getAvailableOnly() != null ? request.getAvailableOnly() : true;
+        return hotelRepository
+                .findByAvailabilityStatusAndDeletedFalseAndVerifiedTrue(available, p)
+                .map(hotel -> withRooms(hotel, null));
+//                .map(HotelMapper::toHotelResponseDto);
 
-        // Default: return all available hotels
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Place> hotels = placeRepository.findByCategoryAndAvailabilityStatusAndDeletedFalse(
-                PlaceCategory.HOTEL, request.getAvailableOnly(), pageable);
-        return hotels.map(HotelMapper::toHotelResponseDto);
     }
 
     @Override
@@ -175,7 +154,7 @@ public class HotelServiceImpl implements HotelService {
     public Page<HotelResponseDto> findNearbyHotels(Double lat, Double lon, Double radius,
             BigDecimal minPrice, BigDecimal maxPrice,
             BigDecimal minRating, int page, int size) {
-        HotelSearchRequestDto request = HotelSearchRequestDto.builder()
+        HotelSearchRequestDto req = HotelSearchRequestDto.builder()
                 .latitude(lat)
                 .longitude(lon)
                 .radius(radius)
@@ -185,79 +164,153 @@ public class HotelServiceImpl implements HotelService {
                 .page(page)
                 .size(size)
                 .build();
-
-        return searchHotelsWithLocation(request);
+        return searchHotelsWithLocation(req);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<HotelResponseDto> findHotelsByCity(String city, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Place> hotels = placeRepository.findByCategoryAndCityContainingIgnoreCaseAndDeletedFalse(
-                PlaceCategory.HOTEL, city, pageable);
-        return hotels.map(HotelMapper::toHotelResponseDto);
+        Pageable p = PageRequest.of(page, size);
+        return hotelRepository
+                .findByCityContainingIgnoreCaseAndDeletedFalseAndVerifiedTrue(city, p)
+                .map(hotel -> withRooms(hotel, null));
+//                .map(HotelMapper::toHotelResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<HotelResponseDto> filterByPriceRange(BigDecimal minPrice, BigDecimal maxPrice, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Place> hotels = placeRepository.findByCategoryAndPricePerNightBetweenAndDeletedFalse(
-                PlaceCategory.HOTEL, minPrice, maxPrice, pageable);
-        return hotels.map(HotelMapper::toHotelResponseDto);
+    public Page<HotelResponseDto> filterByPriceRange(BigDecimal minPrice, BigDecimal maxPrice,
+            int page, int size) {
+        Pageable p = PageRequest.of(page, size);
+        BigDecimal lo = minPrice != null ? minPrice : BigDecimal.ZERO;
+        BigDecimal hi = maxPrice != null ? maxPrice : new BigDecimal("999999.99");
+        return hotelRepository
+                .findByPricePerNightBetweenAndDeletedFalseAndVerifiedTrue(lo, hi, p)
+                .map(hotel -> withRooms(hotel, null));
+//                .map(HotelMapper::toHotelResponseDto);
     }
 
-    // Helper methods
+    // helper functions
+    private Hotel buildHotelFromDto(CreateHotelDto dto) {
+        Hotel hotel = new Hotel();
+        hotel.setName(dto.getName());
+        hotel.setDescription(dto.getDescription());
+        hotel.setCity(dto.getCity());
+        hotel.setAddress(dto.getAddress());
+        hotel.setContactInfo(dto.getContactInfo());
+        hotel.setOpeningHours(dto.getOpeningHours());
+        hotel.setLatitude(dto.getLatitude() != null ? dto.getLatitude() : BigDecimal.ZERO);
+        hotel.setLongitude(dto.getLongitude() != null ? dto.getLongitude() : BigDecimal.ZERO);
+        hotel.setPricePerNight(dto.getPricePerNight());
+        hotel.setRating(dto.getRating());
+//        hotel.setImageUrl(dto.getImageUrl());
+        if (dto.getImageUrls() != null && !dto.getImageUrls().isEmpty()) {
+            hotel.setImageUrl(dto.getImageUrls().get(0));
+            hotel.setImageUrls(dto.getImageUrls());
+        } else {
+            hotel.setImageUrl(dto.getImageUrl());
+        }
+        hotel.setAmenities(dto.getAmenities() != null ? dto.getAmenities() : "[]");
+        hotel.setDeleted(false);
+        hotel.setPopularity(0L);
+        return hotel;
+    }
 
-    private Page<HotelResponseDto> searchHotelsWithLocation(HotelSearchRequestDto request) {
-        // Calculate bounding box for efficient filtering
-        double latDelta = request.getRadius() / 111.0; // 1 degree latitude ≈ 111 km
-        double lonDelta = request.getRadius() / (111.0 * Math.cos(Math.toRadians(request.getLatitude())));
+//    private HotelResponseDto withRooms(Hotel hotel, Double distance) {
+//        List<Room> rooms = roomRepository.findByHotelId(hotel.getId());
+//        return HotelMapper.toHotelResponseDto(hotel, distance, rooms);
+//    }
+    private HotelResponseDto withRooms(Hotel hotel, Double distance) {
 
-        BigDecimal minLat = BigDecimal.valueOf(request.getLatitude() - latDelta);
-        BigDecimal maxLat = BigDecimal.valueOf(request.getLatitude() + latDelta);
-        BigDecimal minLon = BigDecimal.valueOf(request.getLongitude() - lonDelta);
-        BigDecimal maxLon = BigDecimal.valueOf(request.getLongitude() + lonDelta);
+        List<Room> rooms = roomRepository.findByHotelId(hotel.getId());
 
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        HotelResponseDto dto = HotelMapper.toHotelResponseDto(hotel, distance, rooms);
 
-        Page<Object[]> results = placeRepository.searchHotelsWithFilters(
-                request.getLatitude(),
-                request.getLongitude(),
+        // Resolve username
+        String username = "Admin";
+
+        if (hotel.getSubmittedByUserId() != null) {
+            username = userRepository
+                    .findById(hotel.getSubmittedByUserId())
+                    .map(user -> user.getUsername())
+                    .orElse("Unknown");
+        }
+
+        dto.setSubmittedByUsername(username);
+
+        return dto;
+    }
+
+    private Page<HotelResponseDto> searchHotelsWithLocation(HotelSearchRequestDto req) {
+        double latDelta = req.getRadius() / 111.0;
+        double lonDelta = req.getRadius() / (111.0 * Math.cos(Math.toRadians(req.getLatitude())));
+
+        BigDecimal minLat = BigDecimal.valueOf(req.getLatitude() - latDelta);
+        BigDecimal maxLat = BigDecimal.valueOf(req.getLatitude() + latDelta);
+        BigDecimal minLon = BigDecimal.valueOf(req.getLongitude() - lonDelta);
+        BigDecimal maxLon = BigDecimal.valueOf(req.getLongitude() + lonDelta);
+
+        Pageable p = PageRequest.of(req.getPage(), req.getSize());
+        String sortBy = req.getSort() != null ? req.getSort() : "distance";
+
+        Page<Object[]> results = hotelRepository.searchNearby(
+                req.getLatitude(), req.getLongitude(),
                 minLat, maxLat, minLon, maxLon,
-                request.getRadius(),
-                request.getCity(),
-                request.getMinPrice(),
-                request.getMaxPrice(),
-                request.getMinRating(),
-                request.getAvailableOnly(),
-                request.getSort(),
-                pageable);
+                req.getRadius(),
+                req.getCity(),
+                req.getMinPrice(), req.getMaxPrice(), req.getMinRating(),
+                req.getAvailableOnly() != null ? req.getAvailableOnly() : true,
+                sortBy, p);
 
         return results.map(HotelMapper::toHotelResponseDtoFromNativeQuery);
     }
 
-    private Page<HotelResponseDto> searchHotelsByCity(HotelSearchRequestDto request) {
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Place> hotels = placeRepository.findByCategoryAndCityContainingIgnoreCaseAndDeletedFalse(
-                PlaceCategory.HOTEL, request.getCity(), pageable);
-        return hotels.map(HotelMapper::toHotelResponseDto);
+    private Page<HotelResponseDto> searchHotelsByCity(HotelSearchRequestDto req) {
+        Pageable p = PageRequest.of(req.getPage(), req.getSize());
+        return hotelRepository
+                .findByCityContainingIgnoreCaseAndDeletedFalseAndVerifiedTrue(req.getCity(), p)
+                .map(hotel -> withRooms(hotel, null));
+//                .map(HotelMapper::toHotelResponseDto);
     }
 
-    private Page<HotelResponseDto> searchHotelsByPrice(HotelSearchRequestDto request) {
-        BigDecimal minPrice = request.getMinPrice() != null ? request.getMinPrice() : BigDecimal.ZERO;
-        BigDecimal maxPrice = request.getMaxPrice() != null ? request.getMaxPrice() : new BigDecimal("999999.99");
-
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Place> hotels = placeRepository.findByCategoryAndPricePerNightBetweenAndDeletedFalse(
-                PlaceCategory.HOTEL, minPrice, maxPrice, pageable);
-        return hotels.map(HotelMapper::toHotelResponseDto);
+    private Page<HotelResponseDto> searchHotelsByPrice(HotelSearchRequestDto req) {
+        BigDecimal lo = req.getMinPrice() != null ? req.getMinPrice() : BigDecimal.ZERO;
+        BigDecimal hi = req.getMaxPrice() != null ? req.getMaxPrice() : new BigDecimal("999999.99");
+        Pageable p = PageRequest.of(req.getPage(), req.getSize());
+        return hotelRepository
+                .findByPricePerNightBetweenAndDeletedFalseAndVerifiedTrue(lo, hi, p)
+                .map(hotel -> withRooms(hotel, null));
+//                .map(HotelMapper::toHotelResponseDto);
     }
 
-    private Page<HotelResponseDto> searchHotelsByRating(HotelSearchRequestDto request) {
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Place> hotels = placeRepository.findByCategoryAndRatingGreaterThanEqualAndDeletedFalse(
-                PlaceCategory.HOTEL, request.getMinRating(), pageable);
-        return hotels.map(HotelMapper::toHotelResponseDto);
+    private Page<HotelResponseDto> searchHotelsByRating(HotelSearchRequestDto req) {
+        Pageable p = PageRequest.of(req.getPage(), req.getSize());
+        return hotelRepository
+                .findByRatingGreaterThanEqualAndDeletedFalseAndVerifiedTrue(req.getMinRating(), p)
+                .map(hotel -> withRooms(hotel, null));
+//                .map(HotelMapper::toHotelResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<HotelResponseDto> getHotelsWithUser(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Object[]> results = hotelRepository.findHotelsWithUser(pageable);
+
+        return results.map(result -> {
+
+            Hotel hotel = (Hotel) result[0];
+            String username = (String) result[1];
+
+            HotelResponseDto dto = HotelMapper.toHotelResponseDto(hotel);
+
+            dto.setSubmittedByUsername(
+                    username != null ? username : "Admin"
+            );
+
+            return dto;
+        });
     }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * DTO for creating a new hotel.
@@ -51,6 +52,7 @@ public class CreateHotelDto {
 
     @Size(max = 500, message = "Image URL too long")
     private String imageUrl;
+    private List<String> imageUrls;
 
     @Size(max = 100, message = "Contact info too long")
     private String contactInfo;

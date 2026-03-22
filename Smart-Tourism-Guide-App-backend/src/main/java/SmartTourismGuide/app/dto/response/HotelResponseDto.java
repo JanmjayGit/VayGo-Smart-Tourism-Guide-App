@@ -18,12 +18,17 @@ public class HotelResponseDto {
     private String name;
     private String city;
     private String address;
+    private String description;
     private BigDecimal latitude;
     private BigDecimal longitude;
     private BigDecimal pricePerNight;
     private BigDecimal rating;
     private String imageUrl;
-    private List<String> amenities; // Parsed from JSON
+    private List<String> imageUrls; // multi-image gallery
+    private List<String> amenities;
     private Boolean availabilityStatus;
-    private Double distance; // Calculated distance in km (for nearby searches)
+    private Boolean verified;
+    private Double distance;
+    private List<RoomResponseDto> rooms; // available room types
+    private String submittedByUsername;
 }

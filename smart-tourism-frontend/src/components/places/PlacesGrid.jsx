@@ -1,4 +1,4 @@
-import PlaceCard from './PlaceCard';
+import PlaceCard from '../cards/PlaceCard';
 import PlaceCardSkeleton from './PlaceCardSkeleton';
 import { MapPin, Search } from 'lucide-react';
 
@@ -36,7 +36,7 @@ export default function PlacesGrid({ places, loading, onToggleFavorite }) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {places.map((place, index) => (
                 <div
                     key={place.id}

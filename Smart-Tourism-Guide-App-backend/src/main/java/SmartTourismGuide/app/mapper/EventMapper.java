@@ -16,6 +16,7 @@ public class EventMapper {
                 .description(request.getDescription())
                 .category(request.getCategory())
                 .eventDate(request.getEventDate())
+                .endDate(request.getEndDate())
                 .eventTime(request.getEventTime())
                 .city(request.getCity())
                 .venue(request.getVenue())
@@ -45,6 +46,9 @@ public class EventMapper {
         }
         if (request.getEventDate() != null) {
             event.setEventDate(request.getEventDate());
+        }
+        if (request.getEndDate() != null) {
+            event.setEndDate(request.getEndDate());
         }
         if (request.getEventTime() != null) {
             event.setEventTime(request.getEventTime());
@@ -94,6 +98,7 @@ public class EventMapper {
                 .description(event.getDescription())
                 .category(event.getCategory())
                 .eventDate(event.getEventDate())
+                .endDate(event.getEndDate())
                 .eventTime(event.getEventTime())
                 .city(event.getCity())
                 .venue(event.getVenue())
@@ -106,6 +111,12 @@ public class EventMapper {
                 .entryFee(event.getEntryFee())
                 .isFree(event.getIsFree())
                 .imageUrl(event.getImageUrl())
+                .imageUrls(
+                        event.getImages()
+                                .stream()
+                                .map(img -> img.getImageUrl())
+                                .toList()
+                )
                 .websiteUrl(event.getWebsiteUrl())
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())

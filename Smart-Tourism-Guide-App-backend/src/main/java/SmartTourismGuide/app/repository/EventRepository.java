@@ -19,15 +19,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
         Optional<Event> findByIdAndDeletedFalse(Long id);
 
-        @Query("SELECT e FROM Event e WHERE e.deleted = false " +
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
                         "AND e.eventDate >= :today ORDER BY e.eventDate ASC")
         Page<Event> findUpcomingEvents(@Param("today") LocalDate today, Pageable pageable);
 
-        @Query("SELECT e FROM Event e WHERE e.deleted = false " +
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
                         "AND e.eventDate = :today ORDER BY e.eventTime ASC")
         Page<Event> findCurrentEvents(@Param("today") LocalDate today, Pageable pageable);
 
-        @Query("SELECT e FROM Event e WHERE e.deleted = false " +
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
                         "AND e.eventDate BETWEEN :startDate AND :endDate " +
                         "ORDER BY e.eventDate ASC")
         Page<Event> findEventsByDateRange(
@@ -35,7 +35,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("endDate") LocalDate endDate,
                         Pageable pageable);
 
-        @Query("SELECT e FROM Event e WHERE e.deleted = false " +
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
                         "AND LOWER(e.city) = LOWER(:city) " +
                         "AND e.eventDate >= :today ORDER BY e.eventDate ASC")
         Page<Event> findEventsByCity(
@@ -43,7 +43,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("today") LocalDate today,
                         Pageable pageable);
 
-        @Query("SELECT e FROM Event e WHERE e.deleted = false " +
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
                         "AND e.category = :category " +
                         "AND e.eventDate >= :today ORDER BY e.eventDate ASC")
         Page<Event> findEventsByCategory(
@@ -55,7 +55,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         "(6371 * acos(cos(radians(:lat)) * cos(radians(latitude)) * " +
                         "cos(radians(longitude) - radians(:lon)) + " +
                         "sin(radians(:lat)) * sin(radians(latitude)))) AS distance " +
-                        "FROM events WHERE deleted = false " +
+                        "FROM events WHERE deleted = false AND verified = true " +
                         "AND event_date >= :today " +
                         "AND latitude IS NOT NULL AND longitude IS NOT NULL " +
                         "HAVING distance <= :radiusKm " +
@@ -66,7 +66,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("radiusKm") Double radiusKm,
                         @Param("today") LocalDate today);
 
-        @Query("SELECT e FROM Event e WHERE e.deleted = false " +
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
                         "AND (:city IS NULL OR LOWER(e.city) = LOWER(:city)) " +
                         "AND (:category IS NULL OR e.category = :category) " +
                         "AND (:startDate IS NULL OR e.eventDate >= :startDate) " +
@@ -79,11 +79,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                         @Param("endDate") LocalDate endDate,
                         Pageable pageable);
 
-
         @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.eventDate = :eventDate")
         List<Event> findByEventDate(@Param("eventDate") LocalDate eventDate);
 
         @Modifying
         @Query("UPDATE Event e SET e.deleted = false WHERE e.id = :id")
         void restore(@Param("id") Long id);
+
+        // ── Moderation queries ────────────────────────────────────────────────
+        @Query("SELECT e FROM Event e WHERE e.verified = false AND e.deleted = false ORDER BY e.createdAt DESC")
+        Page<Event> findPendingEvents(Pageable pageable);
 }

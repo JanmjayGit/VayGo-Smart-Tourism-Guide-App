@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,6 +27,8 @@ public class UpdateEventRequest {
 
     @FutureOrPresent(message = "Event date must be today or in the future")
     private LocalDate eventDate;
+
+    private LocalDate endDate;
 
     private LocalTime eventTime;
 
@@ -60,7 +63,7 @@ public class UpdateEventRequest {
 
     @Size(max = 500, message = "Image URL must not exceed 500 characters")
     private String imageUrl;
-
+    private List<String> imageUrls;
     @Size(max = 500, message = "Website URL must not exceed 500 characters")
     private String websiteUrl;
 }

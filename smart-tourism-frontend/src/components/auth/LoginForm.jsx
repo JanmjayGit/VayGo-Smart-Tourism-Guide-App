@@ -1,175 +1,169 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Eye, EyeOff } from 'lucide-react';
+import {
+    Card, CardHeader, CardTitle, CardDescription,
+    CardContent, CardFooter,
+} from '@/components/ui/card';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function LoginForm() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { login } = useAuth();
 
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-    });
-
+    // The backend /api/auth/signin accepts { username, password }.
+    // Spring Security's UserDetailsService checks both username and email,
+    // so we just pass whatever the user typed as the "username" field.
+    const [identifier, setIdentifier] = useState('');
+    const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [showPwd, setShowPwd] = useState(false);
 
-    // Handle input change
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
-        setApiError('');
-    };
+    // Success message from reset-password redirect
+    const successMsg = location.state?.message ?? '';
 
-    // Validate form
     const validate = () => {
-        const newErrors = {};
-
-        if (!formData.username) {
-            newErrors.username = 'Username is required';
-        } else if (formData.username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters';
+        const errs = {};
+        if (!identifier.trim()) {
+            errs.identifier = 'Username or email is required';
         }
-
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+        if (!password) {
+            errs.password = 'Password is required';
+        } else if (password.length < 6) {
+            errs.password = 'Password must be at least 6 characters';
         }
-
-        return newErrors;
+        return errs;
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setApiError('');
+        const errs = validate();
+        if (Object.keys(errs).length > 0) { setErrors(errs); return; }
 
-        // Validate
-        const newErrors = validate();
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
-        }
-
-        // Submit
         setLoading(true);
-        const result = await login(formData.username, formData.password);
+        // Pass identifier as the username field — backend handles email lookup internally
+        const result = await login(identifier.trim(), password);
         setLoading(false);
 
         if (result.success) {
-            navigate('/dashboard');
+            const { user } = result;
+            const isAdmin = user?.role === 'ROLE_ADMIN' || user?.roles?.includes('ROLE_ADMIN');
+            navigate(isAdmin ? '/admin' : '/dashboard');
         } else {
             setApiError(result.message);
         }
     };
 
+    const setField = (field, val) => {
+        if (field === 'identifier') setIdentifier(val);
+        else setPassword(val);
+        setErrors((p) => ({ ...p, [field]: '' }));
+        setApiError('');
+    };
+
     return (
-        <Card className="w-full max-w-md mx-auto shadow-lg">
+        <Card className="w-full max-w-md mx-auto shadow-lg border border-gray-100 rounded-2xl">
             <CardHeader className="space-y-1">
                 <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
-                <CardDescription className="text-center">
-                    Sign in to your TravelBuddy account
+                <CardDescription className="text-center text-gray-500">
+                    Sign in to your VayGo account
                 </CardDescription>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className={"-mb-2"}>
+                {/* Success banner */}
+                {successMsg && (
+                    <div className="mb-4 px-3 py-2.5 bg-teal-50 border border-teal-100 rounded-lg text-sm text-teal-700 font-medium">
+                        {successMsg}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Username Field */}
-                    <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
+                    {/* Username or Email */}
+                    <div className="space-y-1.5">
+                        <Label htmlFor="identifier">Username or Email</Label>
                         <Input
-                            id="username"
-                            name="username"
+                            id="identifier"
+                            name="identifier"
                             type="text"
-                            placeholder="Enter your username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className={errors.username ? 'border-red-500 focus:ring-red-500' : ''}
+                            placeholder="Enter your username or email"
+                            value={identifier}
+                            onChange={(e) => setField('identifier', e.target.value)}
+                            className={errors.identifier ? 'border-red-400' : ''}
                             autoComplete="username"
                         />
-                        {errors.username && (
-                            <p className="text-sm text-red-500">
-                                {errors.username}
-                            </p>
+                        {errors.identifier && (
+                            <p className="text-xs text-red-500">{errors.identifier}</p>
                         )}
                     </div>
 
-                    {/* Password Field */}
-                    <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                    {/* Password */}
+                    <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="password">Password</Label>
+                            <Link
+                                to="/forgot-password"
+                                className="text-xs text-teal-600 hover:underline font-medium"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
                         <div className="relative">
                             <Input
                                 id="password"
                                 name="password"
-                                type={showPassword ? "text" : "password"}
+                                type={showPwd ? 'text' : 'password'}
                                 placeholder="Enter your password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={errors.password ? 'border-red-500 focus:ring-red-500 pr-10' : 'pr-10'}
+                                value={password}
+                                onChange={(e) => setField('password', e.target.value)}
+                                className={errors.password ? 'border-red-400 pr-10' : 'pr-10'}
                                 autoComplete="current-password"
                             />
                             <button
                                 type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                onClick={() => setShowPwd((s) => !s)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                aria-label={showPwd ? 'Hide password' : 'Show password'}
                             >
-                                {showPassword ? (
-                                    <EyeOff className="h-5 w-5" />
-                                ) : (
-                                    <Eye className="h-5 w-5" />
-                                )}
+                                {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
                         {errors.password && (
-                            <p className="text-sm text-red-500">
-                                {errors.password}
-                            </p>
+                            <p className="text-xs text-red-500">{errors.password}</p>
                         )}
                     </div>
 
                     {/* API Error */}
                     {apiError && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                            <p className="text-sm text-red-600">
-                                {apiError}
-                            </p>
+                        <div className="px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm text-red-600">{apiError}</p>
                         </div>
                     )}
 
-                    {/* Submit Button */}
                     <Button
                         type="submit"
-                        className="w-full"
                         disabled={loading}
+                        className="w-full bg-teal-600 hover:bg-teal-700 text-white h-10"
                     >
-                        {loading ? (
-                            <span>
-                                Signing in...
-                            </span>
-                        ) : (
-                            'Sign In'
-                        )}
+                        {loading
+                            ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Signing in…</>
+                            : 'Sign In'
+                        }
                     </Button>
                 </form>
             </CardContent>
 
-            <CardFooter className="flex justify-center border-t pt-4">
+            <CardFooter className="flex justify-center border-t pt-4 mb-1 ">
                 <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link to="/register" className="text-blue-600 hover:underline font-medium">
+                    <Link to="/register" className="text-teal-600 hover:underline font-medium">
                         Sign up
                     </Link>
                 </p>

@@ -2,16 +2,15 @@ package SmartTourismGuide.app.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import SmartTourismGuide.app.dto.response.ApiResponseDto;
+import SmartTourismGuide.app.dto.request.ForgotPasswordRequest;
 import SmartTourismGuide.app.dto.request.LoginDto;
+import SmartTourismGuide.app.dto.request.ResetPasswordRequest;
 import SmartTourismGuide.app.dto.request.SignupDto;
+import SmartTourismGuide.app.dto.response.ApiResponseDto;
 import SmartTourismGuide.app.service.AuthService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -19,6 +18,7 @@ import SmartTourismGuide.app.service.AuthService;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
 
     @PostMapping("/signin")
@@ -33,5 +33,24 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponseDto> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        ApiResponseDto response = authService.forgotPassword(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            ApiResponseDto response = authService.resetPassword(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponseDto(ex.getMessage()));
+        }
     }
 }

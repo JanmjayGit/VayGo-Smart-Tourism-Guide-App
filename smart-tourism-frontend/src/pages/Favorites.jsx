@@ -52,7 +52,7 @@ export default function Favorites() {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            setFavorites(favorites.filter(fav => fav.place?.id !== placeId));
+            setFavorites(favorites.filter(fav => fav.placeId !== placeId));
             toast.success('Removed from favorites');
         } catch (error) {
             toast.error('Failed to remove favorite');
@@ -62,7 +62,7 @@ export default function Favorites() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <div className="bg-white border-b">
+                <div className="bg-gray-50">
                     <div className="container mx-auto px-4 py-8">
                         <h1 className="text-4xl font-bold">My Favorites</h1>
                     </div>
@@ -98,8 +98,8 @@ export default function Favorites() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-white border-b">
-                <div className="container mx-auto px-4 py-8">
+            <div className="bg-gray-50 border-none">
+                <div className="container mx-auto px-4 py-6">
                     <h1 className="text-4xl font-bold mb-2">My Favorites</h1>
                     <p className="text-gray-600">
                         {favorites.length} {favorites.length === 1 ? 'place' : 'places'} saved
@@ -121,73 +121,70 @@ export default function Favorites() {
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {favorites.map((favorite) => {
-                            const place = favorite.place;
-                            if (!place) return null;
+                    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+                        {favorites.map((favorite) => (
+                            <div key={favorite.id} className="group cursor-pointer">
 
-                            return (
-                                <Card
-                                    key={favorite.id}
-                                    className="group overflow-hidden hover:shadow-xl transition-all duration-300"
+                                {/* Image */}
+                                <div
+                                    className="relative w-full aspect-[1/1] overflow-hidden rounded-3xl"
+                                    onClick={() => navigate(`/places/${favorite.placeId}`)}
                                 >
-                                    {/* Image */}
-                                    <div
-                                        className="relative overflow-hidden aspect-video bg-gray-200 cursor-pointer"
-                                        onClick={() => navigate(`/places/${place.id}`)}
+                                    <img
+                                        src={favorite.imageUrl || "/placeholder-place.jpg"}
+                                        alt={favorite.placeName}
+                                        className="w-full h-full object-cover transition duration-700 group-hover:brightness-95"
+                                        loading="lazy"
+                                    />
+
+                                    {/* Remove Button (Airbnb style floating) */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoveFavorite(favorite.placeId);
+                                        }}
+                                        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-md hover:scale-110 transition"
                                     >
-                                        <img
-                                            src={place.imageUrl || '/placeholder-place.jpg'}
-                                            alt={place.name}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                            loading="lazy"
-                                        />
+                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                    </button>
+                                </div>
 
-                                        {/* Remove Button */}
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="absolute top-3 right-3 bg-white/95 hover:bg-white shadow-lg"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRemoveFavorite(place.id);
-                                            }}
-                                        >
-                                            <Trash2 className="h-5 w-5 text-red-500" />
-                                        </Button>
-                                    </div>
+                                {/* Content Outside Image */}
+                                <div className="mt-4 space-y-1">
 
-                                    {/* Content */}
-                                    <CardContent className="p-4 space-y-3">
-                                        <h3
-                                            className="font-bold text-lg leading-tight group-hover:text-blue-600 transition-colors cursor-pointer line-clamp-2"
-                                            onClick={() => navigate(`/places/${place.id}`)}
-                                        >
-                                            {place.name}
-                                        </h3>
+                                    {/* Title */}
+                                    <h3
+                                        onClick={() => navigate(`/places/${favorite.placeId}`)}
+                                        className="font-semibold text-[16px] text-gray-900 leading-tight line-clamp-2"
+                                    >
+                                        {favorite.placeName}
+                                    </h3>
 
-                                        {/* Rating */}
-                                        {place.rating && (
-                                            <div className="flex items-center gap-2">
-                                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                                <span className="font-medium">{place.rating}</span>
-                                            </div>
-                                        )}
-
-                                        {/* Location */}
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <MapPin className="h-4 w-4" />
-                                            <span className="truncate">{place.address || place.city}</span>
+                                    {/* Rating */}
+                                    {favorite.rating && (
+                                        <div className="flex items-center gap-1 text-sm text-gray-700">
+                                            <Star className="h-4 w-4 fill-black text-black" />
+                                            <span>{Number(favorite.rating).toFixed(1)}</span>
                                         </div>
+                                    )}
 
-                                        {/* Added Date */}
+                                    {/* Location */}
+                                    {favorite.city && (
+                                        <div className="flex items-center gap-1 text-sm text-gray-500">
+                                            <MapPin className="h-4 w-4" />
+                                            <span className="truncate">{favorite.city}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Saved Date */}
+                                    {favorite.savedAt && (
                                         <p className="text-xs text-gray-500">
-                                            Added {new Date(favorite.createdAt).toLocaleDateString()}
+                                            Saved {new Date(favorite.savedAt).toLocaleDateString()}
                                         </p>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
+                                    )}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>

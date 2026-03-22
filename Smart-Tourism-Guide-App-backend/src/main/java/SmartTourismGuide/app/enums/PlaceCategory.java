@@ -2,7 +2,22 @@ package SmartTourismGuide.app.enums;
 
 public enum PlaceCategory {
     ATTRACTION,
+    MUSEUM,
+    HISTORICAL_SITE,
+    RELIGIOUS_SITE,
+    PARK,
+    BEACH,
     HOTEL,
+    RESORT,
+    HOSTEL,
+    MOUNTAIN,
+    TREK,
     RESTAURANT,
-    EVENT
+    CAFE,
+    STREET_FOOD,
+    EVENT,
+    ADVENTURE_ACTIVITY,
+    SHOPPING_MALL,
+    AIRPORT,
+    HOSPITAL,
 }

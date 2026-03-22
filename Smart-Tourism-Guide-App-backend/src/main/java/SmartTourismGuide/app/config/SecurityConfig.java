@@ -66,8 +66,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/places").permitAll()
-                        .requestMatchers("/api/places/nearby").permitAll()
-                        .requestMatchers("/api/places/*/navigation").permitAll()
+                        .requestMatchers("/api/places/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/hotels/request")
+                        .authenticated()
                         .requestMatchers("/api/hotels/**").permitAll()
                         .requestMatchers("/api/restaurants/**").permitAll()
                         .requestMatchers("/api/map/**").permitAll()
@@ -82,6 +83,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/emergency/{id}").permitAll() // Public: service details
                         .requestMatchers("/api/emergency/alert").hasRole("ADMIN") // Admin: broadcast alerts
                         .requestMatchers("/api/emergency").hasRole("ADMIN") // Admin: CRUD operations
+
+                        // Public: room availability check (no auth required to view room options)
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/bookings/hotels/**").permitAll()
 
                         .requestMatchers("/api/reviews/place/**").permitAll()
                         .requestMatchers("/api/reviews/**").authenticated()
