@@ -166,9 +166,9 @@ export default function Navbar() {
                         ) : (
                             <>
                                 <Button
-                                    variant="ghost"
+                                    variant="default"
                                     onClick={() => navigate('/login')}
-                                    className="hidden sm:flex text-sm font-medium text-white bg-gray-800"
+                                    className="hidden sm:flex text-sm font-medium text-white bg-gray-800 hover:bg-gray-700"
                                 >
                                     Sign In
                                 </Button>

@@ -39,7 +39,7 @@ export default function AirQualityCard({ aqi, windSpeed }) {
                 </div>
 
                 {/* AQI display number + badge */}
-                <div className="mt-4">
+                <div className="mt-6">
                     <div className="flex items-center gap-2">
                         <span className="text-5xl font-extrabold text-gray-800">{displayNum}</span>
                         {aqi && (
@@ -49,14 +49,14 @@ export default function AirQualityCard({ aqi, windSpeed }) {
                         )}
                     </div>
                     {/* Wind speed + PM 2.5 */}
-                    <p className="text-lg text-slate-900 mt-3 font-medium">
+                    <p className="text-lg text-slate-900 mt-6 font-medium">
                         {windSpeed ? `${windSpeed} m/s Wind` : 'Wind data loading'}
                         {aqi?.pm25 && <span className="ml-2 text-sm text-slate-700">· PM 2.5: {pm25Display}</span>}
                     </p>
                 </div>
 
                 {/* Quality segmented toggle — active pill follows current level */}
-                <div className="mt-4 bg-white/20 backdrop-blur rounded-2xl p-1 flex">
+                <div className="mt-6 bg-white/20 backdrop-blur rounded-2xl p-1 flex">
                     {[
                         { label: 'Good', active: isGood },
                         { label: 'Standard', active: isStandard },
@@ -73,7 +73,7 @@ export default function AirQualityCard({ aqi, windSpeed }) {
                 </div>
 
                 {/* Progress bar — width proportional to AQI level */}
-                <div className="mt-5 h-1.5 rounded-full bg-white/30">
+                <div className="mt-6 h-1.5 rounded-full bg-white/30">
                     <div
                         className="h-full rounded-full bg-orange-500 transition-all duration-700"
                         style={{ width: aqi ? `${(level / 5) * 100}%` : '50%' }}

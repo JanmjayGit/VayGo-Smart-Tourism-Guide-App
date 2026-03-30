@@ -151,14 +151,14 @@ export default function Favorites() {
                                 {/* Content Outside Image */}
                                 <div className="mt-4 space-y-2">
                                     <div className="flex items-start justify-between gap-3">
-                                        <h3
+                                        <button
                                             onClick={() => navigate(`/places/${favorite.placeId}`)}
-                                            className="font-semibold text-[16px] text-gray-900 leading-tight line-clamp-2"
+                                            className="font-semibold text-[16px] text-gray-900 leading-tight line-clamp-2 text-left"
                                         >
                                             {favorite.placeName}
-                                        </h3>
+                                        </button>
 
-                                        {favorite.rating && (
+                                        {favorite.rating && !isNaN(Number(favorite.rating)) && (
                                             <div className="flex shrink-0 items-center gap-1 text-sm font-medium text-gray-800">
                                                 <Star className="h-4 w-4 fill-black text-black" />
                                                 <span>{Number(favorite.rating).toFixed(1)}</span>
