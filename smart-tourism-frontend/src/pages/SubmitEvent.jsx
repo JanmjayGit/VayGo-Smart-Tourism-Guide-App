@@ -12,8 +12,21 @@ import apiEndpoints from '@/util/apiEndpoints';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 
 const EVENT_CATEGORIES = [
-    'MUSIC', 'CULTURAL', 'SPORTS', 'FOOD', 'ART', 'TECHNOLOGY',
-    'BUSINESS', 'EDUCATION', 'HEALTH', 'TRAVEL', 'NATURE', 'OTHER'
+    { value: 'FESTIVAL', label: 'Cultural Festival' },
+    { value: 'CULTURAL', label: 'Cultural Event' },
+    { value: 'EXHIBITION', label: 'Exhibition' },
+    { value: 'CONCERT', label: 'Concert / Music' },
+    { value: 'SPORTS', label: 'Sports Event' },
+    { value: 'RELIGIOUS', label: 'Religious' },
+    { value: 'WORKSHOP', label: 'Workshops & Learning' },
+    { value: 'FOOD', label: 'Food & Culinary Events' },
+    { value: 'ART', label: 'Art & Craft' },
+    { value: 'WELLNESS', label: 'Wellness & Yoga' },
+    { value: 'SPIRITUAL', label: 'Spiritual Gathering' },
+    { value: 'BUSINESS', label: 'Business & Networking' },
+    { value: 'TECH', label: 'Tech Events' },
+    { value: 'TREKKING', label: 'Trekking & Hiking' },
+    { value: 'OTHER', label: 'Other' },
 ];
 
 function Field({ label, name, type = 'text', placeholder, required, hint, value, onChange, error }) {
@@ -174,7 +187,7 @@ export default function SubmitEvent() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {EVENT_CATEGORIES.map(c => (
-                                            <SelectItem key={c} value={c}>{c.charAt(0) + c.slice(1).toLowerCase()}</SelectItem>
+                                            <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

@@ -59,7 +59,7 @@ export default function Places() {
             />
 
             {/* Main Content */}
-            <div className="max-w-[1350px] mx-auto px-4 py-8">
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="gap-8">
                     {/* Places Grid */}
                     <div className="lg:col-span-2">

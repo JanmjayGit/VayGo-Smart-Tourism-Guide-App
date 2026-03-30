@@ -63,11 +63,11 @@ export default function Favorites() {
         return (
             <div className="min-h-screen bg-gray-50">
                 <div className="bg-gray-50">
-                    <div className="container mx-auto px-4 py-8">
+                    <div className="max-w-7xl mx-auto w-full px-4 py-8">
                         <h1 className="text-4xl font-bold">My Favorites</h1>
                     </div>
                 </div>
-                <div className="container mx-auto px-4 py-8">
+                <div className="max-w-7xl mx-auto w-full px-4 py-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
                             <div key={i} className="space-y-3">
@@ -96,7 +96,7 @@ export default function Favorites() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto w-full px-4 py-8">
             {/* Header */}
             <div className="bg-gray-50 border-none">
                 <div className="container mx-auto px-4 py-6">
@@ -121,7 +121,7 @@ export default function Favorites() {
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
                         {favorites.map((favorite) => (
                             <div key={favorite.id} className="group cursor-pointer">
 
@@ -137,7 +137,6 @@ export default function Favorites() {
                                         loading="lazy"
                                     />
 
-                                    {/* Remove Button (Airbnb style floating) */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -150,39 +149,37 @@ export default function Favorites() {
                                 </div>
 
                                 {/* Content Outside Image */}
-                                <div className="mt-4 space-y-1">
+                                <div className="mt-4 space-y-2">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <h3
+                                            onClick={() => navigate(`/places/${favorite.placeId}`)}
+                                            className="font-semibold text-[16px] text-gray-900 leading-tight line-clamp-2"
+                                        >
+                                            {favorite.placeName}
+                                        </h3>
 
-                                    {/* Title */}
-                                    <h3
-                                        onClick={() => navigate(`/places/${favorite.placeId}`)}
-                                        className="font-semibold text-[16px] text-gray-900 leading-tight line-clamp-2"
-                                    >
-                                        {favorite.placeName}
-                                    </h3>
+                                        {favorite.rating && (
+                                            <div className="flex shrink-0 items-center gap-1 text-sm font-medium text-gray-800">
+                                                <Star className="h-4 w-4 fill-black text-black" />
+                                                <span>{Number(favorite.rating).toFixed(1)}</span>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                    {/* Rating */}
-                                    {favorite.rating && (
-                                        <div className="flex items-center gap-1 text-sm text-gray-700">
-                                            <Star className="h-4 w-4 fill-black text-black" />
-                                            <span>{Number(favorite.rating).toFixed(1)}</span>
+                                    <div className="flex items-center justify-between gap-3 text-sm text-gray-500">
+                                        <div className="flex min-w-0 items-center gap-1">
+                                            <MapPin className="h-4 w-4 shrink-0" />
+                                            <span className="truncate">{favorite.city || 'Unknown location'}</span>
                                         </div>
-                                    )}
 
-                                    {/* Location */}
-                                    {favorite.city && (
-                                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                                            <MapPin className="h-4 w-4" />
-                                            <span className="truncate">{favorite.city}</span>
-                                        </div>
-                                    )}
-
-                                    {/* Saved Date */}
-                                    {favorite.savedAt && (
-                                        <p className="text-xs text-gray-500">
-                                            Saved {new Date(favorite.savedAt).toLocaleDateString()}
+                                        <p className="shrink-0 text-xs text-gray-500">
+                                            {favorite.savedAt
+                                                ? `Saved ${new Date(favorite.savedAt).toLocaleDateString()}`
+                                                : ''}
                                         </p>
-                                    )}
+                                    </div>
                                 </div>
+
                             </div>
                         ))}
                     </div>

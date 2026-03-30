@@ -20,7 +20,27 @@ import ConfirmDialog from '@/components/admin/ConfirmDialog';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 
 // Must match backend EventCategory enum exactly
-const EVENT_CATEGORIES = ['FESTIVAL', 'CULTURAL', 'EXHIBITION', 'CONCERT', 'SPORTS', 'RELIGIOUS', 'OTHER'];
+const EVENT_CATEGORIES = [
+    'FESTIVAL',
+    'CULTURAL',
+    'EXHIBITION',
+    'CONCERT',
+    'SPORTS',
+    'RELIGIOUS',
+
+    // NEW
+    'WORKSHOP',
+    'FOOD',
+    'ART',
+    'WELLNESS',
+    'SPIRITUAL',
+    'BUSINESS',
+    'TECH',
+    'TREKKING',
+
+    'OTHER'
+];
+
 const CAT_STYLES = {
     FESTIVAL: 'bg-violet-50 text-violet-700 border-violet-200',
     CULTURAL: 'bg-cyan-50 text-cyan-700 border-cyan-200',
@@ -28,6 +48,21 @@ const CAT_STYLES = {
     CONCERT: 'bg-pink-50 text-pink-700 border-pink-200',
     SPORTS: 'bg-green-50 text-green-700 border-green-200',
     RELIGIOUS: 'bg-amber-50 text-amber-700 border-amber-200',
+
+    // NEW CATEGORIES
+
+    WORKSHOP: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    FOOD: 'bg-red-50 text-red-700 border-red-200',
+    ART: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
+
+    WELLNESS: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    SPIRITUAL: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+
+    BUSINESS: 'bg-slate-100 text-slate-700 border-slate-300',
+    TECH: 'bg-cyan-100 text-cyan-800 border-cyan-300',
+
+    TREKKING: 'bg-lime-50 text-lime-700 border-lime-200',
+
     OTHER: 'bg-slate-50 text-slate-600 border-slate-200',
 };
 

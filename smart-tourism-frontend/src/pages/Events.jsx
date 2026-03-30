@@ -4,6 +4,7 @@ import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import FeaturedBanner from '@/components/events/FeaturedBanner';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
 import { motion } from "framer-motion";
@@ -33,116 +34,22 @@ const CAT_COLORS = {
     CONCERT: 'bg-purple-100 text-purple-700 border-purple-200',
     SPORTS: 'bg-blue-100   text-blue-700   border-blue-200',
     RELIGIOUS: 'bg-amber-100  text-amber-700  border-amber-200',
+    WORKSHOP: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+    FOOD: 'bg-red-100 text-red-700 border-red-200',
+
+    ART: 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200',
+
+    WELLNESS: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    SPIRITUAL: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+
+    BUSINESS: 'bg-slate-100 text-slate-700 border-slate-200',
+    TECH: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+
+    TREKKING: 'bg-lime-100 text-lime-700 border-lime-200',
+
     OTHER: 'bg-gray-100   text-gray-700   border-gray-200',
+
 };
-
-const fmtDate = (d) =>
-    new Date(d).toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-    });
-
-//Featured Event Banner
-function FeaturedBanner({ event }) {
-    const navigate = useNavigate();
-    if (!event) return null;
-
-    return (
-        <div
-            className="relative rounded-2xl overflow-hidden h-[260px] md:h-[300px] cursor-pointer group shadow-lg mb-8"
-            onClick={() => navigate(`/events/${event.id}`)}
-        >
-            <img
-                src={event.imageUrl || '/placeholder-event.jpg'}
-                alt={event.name}
-                className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
-
-            {/* Top badges */}
-            <div className="absolute top-4 left-4 flex gap-2 z-10">
-                <span className="bg-white/80 backdrop-blur-sm text-black text-xs font-semibold px-3 py-1 rounded-full">
-                    Next Event
-                </span>
-            </div>
-
-            {/* Bottom content */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 z-10 flex items-end justify-between gap-4">
-                <div>
-                    <h2 className="text-white text-2xl font-bold leading-tight mb-2 drop-shadow">
-                        {event.name}
-                    </h2>
-                    <div className="flex flex-wrap items-center gap-3 text-white/80 text-sm font-medium">
-                        <span className="flex items-center gap-1 ">
-                            <Calendar className="w-4 h-4" /> {fmtDate(event.eventDate)}
-                        </span>
-                        {(event.city || event.location) && (
-                            <span className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" /> {event.city || event.location}
-                            </span>
-                        )}
-                    </div>
-                </div>
-                <Button
-                    className="bg-white/80 backdrop-blur-sm text-black text-xs font-semibold px-3 py-1 rounded-full"
-                    onClick={(e) => { e.stopPropagation(); navigate(`/events/${event.id}`); }}
-                >
-                    View Event
-                </Button>
-            </div>
-        </div>
-    );
-}
-
-
-// function EventCard({ event }) {
-//     const navigate = useNavigate();
-
-//     return (
-//         <article
-//             className="group cursor-pointer"
-//             onClick={() => navigate(`/events/${event.id}`)}
-//         >
-//             {/* Image */}
-//             <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
-//                 <img
-//                     src={event.imageUrl || "/placeholder-event.jpg"}
-//                     alt={event.name}
-//                     loading="lazy"
-//                     className="w-full h-full object-cover"
-//                 />
-//             </div>
-
-//             {/* Content */}
-//             <div className="mt-3 space-y-1">
-
-//                 {/* Title + Rating */}
-//                 <div className="flex items-start justify-between gap-2">
-//                     <h3 className="font-semibold text-gray-900 text-[15px] leading-tight line-clamp-1">
-//                         {event.name}
-//                     </h3>
-//                 </div>
-
-//                 {/* Location */}
-//                 {(event.city || event.location) && (
-//                     <p className="text-gray-500 text-xs flex items-center gap-1">
-//                         <MapPin className="w-3 h-3" />
-//                         {event.city || event.location}
-//                     </p>
-//                 )}
-
-//                 {/* Date */}
-//                 <p className="text-gray-500 text-xs flex items-center gap-1">
-//                     <Calendar className="w-3 h-3" />
-//                     {fmtDate(event.eventDate)}
-//                 </p>
-
-//             </div>
-//         </article>
-//     );
-// }
 
 
 // Main Page 
@@ -267,7 +174,7 @@ export default function Events() {
                             <Calendar className="h-14 w-14 mx-auto text-gray-300 mb-4" />
                             <h3 className="font-semibold text-lg text-gray-600 mb-2">Failed to load events</h3>
                             <p className="text-gray-500 mb-6">{error}</p>
-                            <Button onClick={fetchEvents} className="bg-pink-600 hover:bg-pink-700 text-white">
+                            <Button onClick={fetchEvents} className="bg-teal-600 hover:bg-teal-700 text-white">
                                 Try Again
                             </Button>
                         </div>

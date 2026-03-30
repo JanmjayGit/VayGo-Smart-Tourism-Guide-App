@@ -77,7 +77,7 @@ export default function PlaceInfo({ place }) {
 
             {/* Action Buttons */}
             <div className="flex gap-2">
-                <Button
+                {/* <Button
                     className="flex-1"
                     variant="outline"
                     asChild
@@ -90,7 +90,7 @@ export default function PlaceInfo({ place }) {
                         <MapPin className="h-4 w-4 mr-2" />
                         Directions
                     </a>
-                </Button>
+                </Button> */}
                 {place.contactNumber && (
                     <Button
                         className="flex-1"

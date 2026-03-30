@@ -37,18 +37,18 @@ export default function WeatherCard({ weather }) {
                 </div>
 
                 {/* Stat pills */}
-                <div className="flex gap-14 mt-5">
-                    <div className="rounded-2xl px-6 py-2 bg-slate-800 text-white text-center">
+                <div className="flex gap-8 mt-5">
+                    <div className="rounded-2xl px-6 py-4 bg-slate-800 text-white text-center">
                         <p className="text-[14px] opacity-60">Pressure</p>
-                        <p className="text-lg font-bold">{weather?.pressure || '—'} mb</p>
+                        <p className="text-md font-semibold">{weather?.pressure || '—'} mb</p>
                     </div>
-                    <div className="rounded-2xl px-6 py-2 bg-green-500 text-white text-center">
-                        <p className="text-[14px] opacity-80">Visibility</p>
-                        <p className="text-lg font-bold">{vis}</p>
+                    <div className="rounded-2xl px-6 py-4 bg-green-500 text-white text-center">
+                        <p className="text-[14px] opacity-90">Visibility</p>
+                        <p className="text-md font-semibold">{vis}</p>
                     </div>
-                    <div className="rounded-2xl px-6 py-2 bg-white text-slate-700 text-center">
+                    <div className="rounded-2xl px-6 py-4 bg-white text-slate-700 text-center">
                         <p className="text-[14px] text-slate-600">Humidity</p>
-                        <p className="text-lg font-bold">{weather?.humidity || '—'}%</p>
+                        <p className="text-md font-semibold">{weather?.humidity || '—'}%</p>
                     </div>
                 </div>
 

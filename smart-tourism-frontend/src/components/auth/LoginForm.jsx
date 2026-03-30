@@ -14,10 +14,6 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
-
-    // The backend /api/auth/signin accepts { username, password }.
-    // Spring Security's UserDetailsService checks both username and email,
-    // so we just pass whatever the user typed as the "username" field.
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
@@ -25,7 +21,6 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [showPwd, setShowPwd] = useState(false);
 
-    // Success message from reset-password redirect
     const successMsg = location.state?.message ?? '';
 
     const validate = () => {
@@ -48,7 +43,6 @@ export default function LoginForm() {
         if (Object.keys(errs).length > 0) { setErrors(errs); return; }
 
         setLoading(true);
-        // Pass identifier as the username field — backend handles email lookup internally
         const result = await login(identifier.trim(), password);
         setLoading(false);
 

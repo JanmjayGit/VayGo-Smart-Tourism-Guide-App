@@ -48,51 +48,49 @@ export default function HotelCard({ hotel }) {
             </div>
 
             {/* Content */}
-            <div className="mt-3 space-y-1">
-                {/* Title */}
-                <h3 className="font-semibold text-gray-900 text-[15px] leading-tight line-clamp-1">
-                    {hotel.name}
-                </h3>
+            <div className="mt-3 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                    <h3 className="line-clamp-1 text-[15px] font-semibold leading-tight text-gray-900">
+                        {hotel.name}
+                    </h3>
 
-                {/* Location */}
+                    {hotel.pricePerNight != null ? (
+                        <p className="shrink-0 text-sm text-gray-900">
+                            <span className="font-bold">
+                                ₹{Number(hotel.pricePerNight).toLocaleString("en-IN")}
+                            </span>
+                            <span className="ml-1 text-gray-500 font-normal">/night</span>
+                        </p>
+                    ) : (
+                        <p className="shrink-0 text-xs text-gray-400">On request</p>
+                    )}
+                </div>
+
                 {(hotel.city || hotel.address) && (
-                    <p className="text-gray-500 text-xs flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {hotel.city}
+                    <p className="flex items-center gap-1 text-xs text-gray-500">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{hotel.city || hotel.address}</span>
                     </p>
                 )}
 
-                {/* Amenities */}
                 {amenities.length > 0 && (
                     <div className="flex flex-wrap gap-1 pt-1">
                         {amenities.map((a, i) => {
                             const Icon = AMENITY_ICONS[a];
-                            // console.log(hotel);
                             return (
                                 <span
                                     key={i}
-                                    className="flex items-center gap-1 text-[10px] text-gray-500 bg-gray-100 px-2 py-[2px] rounded-full"
+                                    className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-[2px] text-[10px] text-gray-500"
                                 >
-                                    {Icon && <Icon className="w-3 h-3" />}
+                                    {Icon && <Icon className="h-3 w-3" />}
                                     {a}
                                 </span>
                             );
                         })}
                     </div>
                 )}
-
-                {/* Price */}
-                {hotel.pricePerNight != null ? (
-                    <p className="pt-1 text-sm text-gray-900">
-                        <span className="font-bold">
-                            ₹{Number(hotel.pricePerNight).toLocaleString("en-IN")}
-                        </span>{" "}
-                        <span className="text-gray-500 font-normal">night</span>
-                    </p>
-                ) : (
-                    <p className="text-xs text-gray-400">Price on request</p>
-                )}
             </div>
+
         </article>
     );
 }

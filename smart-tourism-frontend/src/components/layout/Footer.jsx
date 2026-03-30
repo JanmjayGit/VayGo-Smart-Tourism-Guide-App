@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Globe, Mail, Phone, Twitter, Instagram, Facebook } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#0f2d3d] text-white mt-8">
+        <footer className="bg-[#0f2d3d] text-white">
             <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-14">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 
@@ -17,7 +19,7 @@ export default function Footer() {
                         </p>
                         <div className="flex items-center gap-3 mt-5">
                             <a href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-teal-500 flex items-center justify-center transition-colors">
-                                <Twitter className="w-4 h-4" />
+                                <FontAwesomeIcon icon={faXTwitter} className='w-4 h-4' />
                             </a>
                             <a href="#" className="w-9 h-9 rounded-full bg-white/10 hover:bg-teal-500 flex items-center justify-center transition-colors">
                                 <Instagram className="w-4 h-4" />

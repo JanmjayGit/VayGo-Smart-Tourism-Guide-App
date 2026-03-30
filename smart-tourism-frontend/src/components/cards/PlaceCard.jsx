@@ -129,42 +129,47 @@ export default function PlaceCard({ place, onToggleFavorite }) {
                 )}
             </div>
 
-            {/* Info */}
-            <div className="mt-2 px-0.5">
-                {/* Name */}
-                <h3 className="font-semibold text-gray-900 leading-snug line-clamp-1 text-sm">
-                    {place.name}
-                </h3>
+            {/*  card Info */}
+            <div className="mt-2 px-0.5 space-y-1">
+                <div className="flex items-start justify-between gap-3">
+                    <h3 className="min-w-0 line-clamp-1 text-sm font-semibold leading-snug text-gray-900">
+                        {place.name}
+                    </h3>
 
-                {/* Location */}
-                {location && (
-                    <p className="text-gray-400 text-xs leading-snug mt-0.5 line-clamp-1">{location}</p>
-                )}
+                    <div className="flex shrink-0 items-center gap-1 text-xs">
+                        {rating > 0 ? (
+                            <>
+                                <Star className="h-3 w-3 fill-gray-800 text-gray-800" strokeWidth={0} />
+                                <span className="font-semibold text-gray-800">{rating.toFixed(1)}</span>
+                                <span className="text-gray-300">·</span>
+                                <span className="text-gray-400">
+                                    {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                                </span>
+                            </>
+                        ) : reviewCount > 0 ? (
+                            <span className="text-gray-400">
+                                {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                            </span>
+                        ) : (
+                            <span className="text-gray-400">No reviews</span>
+                        )}
+                    </div>
+                </div>
 
-                {/* Rating + Review count combined */}
-                <div className="flex items-center gap-1 mt-0.5">
-                    {rating > 0 ? (
-                        <>
-                            <Star className="w-3 h-3 fill-gray-800 text-gray-800" strokeWidth={0} />
-                            <span className="text-xs font-semibold text-gray-800">{rating.toFixed(1)}</span>
-                            {reviewCount > 0 && (
-                                <>
-                                    <span className="text-gray-300 text-xs">·</span>
-                                    <span className="text-gray-400 text-xs">
-                                        {reviewCount} review{reviewCount > 1 ? 's' : ''}
-                                    </span>
-                                </>
-                            )}
-                        </>
-                    ) : reviewCount > 0 ? (
-                        <span className="text-gray-400 text-xs">
-                            {reviewCount} review{reviewCount > 1 ? 's' : ''}
-                        </span>
+                <div>
+                    {location ? (
+                        <p className="line-clamp-1 text-xs leading-snug text-gray-400">
+                            {location}
+                        </p>
                     ) : (
-                        <span className="text-gray-400 text-xs">No reviews yet</span>
+                        <p className="text-xs leading-snug text-gray-400">
+                            Location unavailable
+                        </p>
                     )}
                 </div>
             </div>
+
+
         </div>
     );
 }

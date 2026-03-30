@@ -20,7 +20,7 @@ const NAV_LINKS = [
     { path: '/events', label: 'Events' },
     { path: '/hotels', label: 'Hotels' },
     { path: '/favorites', label: 'Favorites' },
-    { path: '/emergency', label: 'Emergency' },
+    // { path: '/emergency', label: 'Emergency' },
     { path: '/weather', label: 'Weather' },
     { path: '/map', label: 'Map' },
 ];
@@ -37,7 +37,7 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-            <div className="w-full px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
                 <div className="relative flex items-center h-16">
 
                     {/* Logo — left */}
@@ -103,7 +103,7 @@ export default function Navbar() {
                                             <DropdownMenuItem onClick={() => navigate('/profile')}>Profile</DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => navigate('/my-bookings')}>My Bookings</DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => navigate('/settings')}>Settings</DropdownMenuItem>
-                                            <DropdownMenuSeparator />
+                                            {/* <DropdownMenuSeparator /> */}
                                             <DropdownMenuItem onClick={() => navigate('/places/submit')}>Add Place</DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => navigate('/events/submit')}>Add Event</DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => navigate('/hotels/request')}>Add Hotel</DropdownMenuItem>
@@ -168,13 +168,13 @@ export default function Navbar() {
                                 <Button
                                     variant="ghost"
                                     onClick={() => navigate('/login')}
-                                    className="hidden sm:flex text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                    className="hidden sm:flex text-sm font-medium text-white bg-gray-800"
                                 >
                                     Sign In
                                 </Button>
                                 <Button
                                     onClick={() => navigate('/register')}
-                                    className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-4 rounded-full shadow"
+                                    className="bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold px-4 rounded-md shadow"
                                 >
                                     Sign Up
                                 </Button>
