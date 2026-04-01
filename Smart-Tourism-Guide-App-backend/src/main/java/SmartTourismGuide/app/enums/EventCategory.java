@@ -1,11 +1,11 @@
 package SmartTourismGuide.app.enums;
 
 public enum EventCategory {
-    FESTIVAL("Cultural Festival"),
-    CULTURAL("Cultural Event"),
+    FESTIVAL("Festival"),
+    CULTURAL("Cultural"),
     EXHIBITION("Exhibition"),
     CONCERT("Concert/Music"),
-    SPORTS("Sports Event"),
+    SPORTS("Sports"),
     RELIGIOUS("Religious"),
 
     WORKSHOP("Workshops"),
@@ -20,7 +20,8 @@ public enum EventCategory {
     TECH("Tech Events"),
 
     TREKKING("Trekking & Hiking"),
-    OTHER("others");
+    OTHER("Other");
+
     private final String description;
 
     EventCategory(String description) {

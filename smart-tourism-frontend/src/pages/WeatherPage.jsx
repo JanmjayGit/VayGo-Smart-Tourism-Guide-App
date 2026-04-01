@@ -10,6 +10,7 @@ import TomorrowCard from '@/components/weather/TomorrowCard';
 import SunArcCard from '@/components/weather/SunArcCard';
 import UVIndexCard from '@/components/weather/UVIndexCard';
 import WeatherPrediction from '@/components/weather/WeatherPrediction';
+import { Cloudy } from 'lucide-react';
 
 function DashboardSkeleton() {
     return (
@@ -29,7 +30,7 @@ function DashboardSkeleton() {
 function ErrorState({ message }) {
     return (
         <div className="flex h-64 flex-col items-center justify-center gap-3 px-4 text-center text-slate-400">
-            <span className="text-4xl">🌩️</span>
+            <span className="text-4xl"><Cloudy /></span>
             <p className="font-semibold text-slate-600">Could not load weather</p>
             <p className="text-sm">{message}</p>
         </div>

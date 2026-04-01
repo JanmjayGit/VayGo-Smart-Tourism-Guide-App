@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Clock, Phone, Globe, DollarSign, MapPin } from 'lucide-react';
+import { Clock, Phone, Globe, IndianRupee, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function PlaceInfo({ place }) {
@@ -25,7 +25,7 @@ export default function PlaceInfo({ place }) {
             link: place.website
         },
         {
-            icon: DollarSign,
+            icon: IndianRupee,
             label: 'Price Range',
             value: place.priceRange,
             show: !!place.priceRange
@@ -77,20 +77,6 @@ export default function PlaceInfo({ place }) {
 
             {/* Action Buttons */}
             <div className="flex gap-2">
-                {/* <Button
-                    className="flex-1"
-                    variant="outline"
-                    asChild
-                >
-                    <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <MapPin className="h-4 w-4 mr-2" />
-                        Directions
-                    </a>
-                </Button> */}
                 {place.contactNumber && (
                     <Button
                         className="flex-1"

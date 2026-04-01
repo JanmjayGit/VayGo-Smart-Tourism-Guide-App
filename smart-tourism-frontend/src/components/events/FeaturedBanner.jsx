@@ -24,7 +24,7 @@ export default function FeaturedBanner({ event }) {
                 alt={event.name}
                 className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
             {/* Top badges */}
             <div className="absolute top-4 left-4 flex gap-2 z-10">

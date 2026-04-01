@@ -12,11 +12,11 @@ import apiEndpoints from '@/util/apiEndpoints';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 
 const EVENT_CATEGORIES = [
-    { value: 'FESTIVAL', label: 'Cultural Festival' },
-    { value: 'CULTURAL', label: 'Cultural Event' },
+    { value: 'FESTIVAL', label: 'Festival' },
+    { value: 'CULTURAL', label: 'Cultural' },
     { value: 'EXHIBITION', label: 'Exhibition' },
-    { value: 'CONCERT', label: 'Concert / Music' },
-    { value: 'SPORTS', label: 'Sports Event' },
+    { value: 'CONCERT', label: 'Concert/Music' },
+    { value: 'SPORTS', label: 'Sports' },
     { value: 'RELIGIOUS', label: 'Religious' },
     { value: 'WORKSHOP', label: 'Workshops & Learning' },
     { value: 'FOOD', label: 'Food & Culinary Events' },
