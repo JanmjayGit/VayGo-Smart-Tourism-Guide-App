@@ -204,7 +204,7 @@ export default function AdminDashboard() {
                                 <Button
                                     onClick={() => navigate('/admin/events')}
                                     variant="outline"
-                                    className="h-12 w-full justify-start rounded-2xl bg-slate-900 px-4 text-white hover:bg-slate-800"
+                                    className="h-12 w-full justify-start rounded-2xl border-slate-300 px-4 hover:bg-slate-50"
                                 >
                                     <Calendar className="mr-3 h-4 w-4 text-violet-600" />
                                     Add New Event
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
                                 <Button
                                     onClick={() => navigate('/admin/notifications')}
                                     variant="outline"
-                                    className="h-12 w-full justify-start rounded-2xl bg-slate-900 px-4 text-white hover:bg-slate-800"
+                                    className="h-12 w-full justify-start rounded-2xl border-slate-300 px-4 hover:bg-slate-50"
                                 >
                                     <Bell className="mr-3 h-4 w-4 text-emerald-600" />
                                     Send Notification

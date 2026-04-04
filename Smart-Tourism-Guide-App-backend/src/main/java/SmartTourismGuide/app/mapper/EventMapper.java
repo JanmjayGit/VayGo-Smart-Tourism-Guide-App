@@ -112,11 +112,11 @@ public class EventMapper {
                 .isFree(event.getIsFree())
                 .imageUrl(event.getImageUrl())
                 .imageUrls(
-                        event.getImages()
-                                .stream()
-                                .map(img -> img.getImageUrl())
-                                .toList()
-                )
+                        event.getImages() != null
+                                ? event.getImages().stream()
+                                        .map(img -> img.getImageUrl())
+                                        .toList()
+                                : List.of())
                 .websiteUrl(event.getWebsiteUrl())
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())
@@ -137,8 +137,7 @@ public class EventMapper {
                         event.getImages()
                                 .stream()
                                 .map(img -> img.getImageUrl())
-                                .toList()
-                )
+                                .toList())
                 .build();
     }
 }

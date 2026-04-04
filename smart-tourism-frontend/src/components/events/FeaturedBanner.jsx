@@ -40,9 +40,6 @@ export default function FeaturedBanner({ event }) {
         return () => clearInterval(interval);
     }, [bannerImages.length]);
 
-    console.log('featured event', event);
-    console.log('imageUrl', event.imageUrl);
-    console.log('imageUrls', event.imageUrls);
 
 
     return (

@@ -183,7 +183,7 @@ export default function Events() {
                     <div className="mb-5 flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-[#1a2b38]">All Events</h2>
                         {!loading && !error && (
-                            <p className="text-sm text-gray-500">{filteredEvents.length} events</p>
+                            <p className="text-sm text-gray-500">{gridEvents.length} events</p>
                         )}
                     </div>
 
@@ -218,7 +218,7 @@ export default function Events() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                            {filteredEvents.map((event) => (
+                            {gridEvents.map((event) => (
                                 <EventCard key={event.id} event={event} />
                             ))}
                         </div>

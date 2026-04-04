@@ -305,8 +305,6 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
     }
 
-    // ── Similar Events ────────────────────────────────────────────────────────
-
     /** Hindi + English stop words to ignore during keyword extraction */
     private static final Set<String> STOP_WORDS = Set.of(
             "wali", "wala", "wale", "ka", "ke", "ki", "ko", "se", "mein", "par",
@@ -362,7 +360,7 @@ public class EventServiceImpl implements EventService {
         });
 
         // 3. Score and sort
-        // High=2 (category + keyword), Medium=1 (keyword only), Low=0 (category only)
+        // Score: 3 (category + keyword), 2 (keyword only), 1 (category only)
         return candidateMap.values().stream()
                 .map(candidate -> {
                     int score = 0;
