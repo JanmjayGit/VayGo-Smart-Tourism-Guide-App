@@ -95,7 +95,7 @@ const apiEndpoints = {
     HOTEL_REVIEWS: (hotelId) => `${BASE_URL}/api/reviews/hotel/${hotelId}`,
 
     // Similar Events
-    SIMILAR_EVENTS: (category) => `${BASE_URL}/api/events/category/${category}`,
+    SIMILAR_EVENTS: `${BASE_URL}/api/events/similar`,
 
     // Map
     MAP_MARKERS_BBOX: `${BASE_URL}/api/map/markers/bbox`,

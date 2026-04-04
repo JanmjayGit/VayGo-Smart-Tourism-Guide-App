@@ -21,6 +21,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/events")
@@ -150,5 +152,15 @@ public class EventController {
         log.info("User {} submitting event: {}", userDetails.getId(), request.getName());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(eventService.submitEvent(userDetails.getId(), request));
+    }
+
+    // ── Similar Events ───────────────────────────────────────────────
+
+    @GetMapping("/similar")
+    public ResponseEntity<List<EventSummaryDto>> getSimilarEvents(
+            @RequestParam Long eventId,
+            @RequestParam(defaultValue = "8") int limit) {
+        log.info("Fetching similar events for eventId: {}", eventId);
+        return ResponseEntity.ok(eventService.getSimilarEvents(eventId, limit));
     }
 }

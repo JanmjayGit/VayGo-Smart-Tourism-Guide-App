@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface EventService {
 
@@ -45,4 +46,6 @@ public interface EventService {
     EventDto verifyEvent(Long id);
 
     void rejectEvent(Long id);
+
+    List<EventSummaryDto> getSimilarEvents(Long eventId, int limit);
 }

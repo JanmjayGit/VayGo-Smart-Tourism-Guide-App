@@ -12,12 +12,13 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Pencil, Trash2, Loader2, Calendar, Search, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Calendar, Search, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
 import ConfirmDialog from '@/components/admin/ConfirmDialog';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
+
 
 // Must match backend EventCategory enum exactly
 const EVENT_CATEGORIES = [
@@ -78,6 +79,7 @@ export default function AdminEvents() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [search, setSearch] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('ALL');
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMode, setDialogMode] = useState('create');
@@ -87,6 +89,7 @@ export default function AdminEvents() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [deleting, setDeleting] = useState(false);
+
 
     const getHeaders = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
@@ -103,12 +106,18 @@ export default function AdminEvents() {
 
     useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
-    const filtered = search
-        ? events.filter(e =>
+    const filtered = events.filter((e) => {
+        const matchesSearch = !search || (
             e.name?.toLowerCase().includes(search.toLowerCase()) ||
             e.city?.toLowerCase().includes(search.toLowerCase()) ||
             e.venue?.toLowerCase().includes(search.toLowerCase())
-        ) : events;
+        );
+
+        const matchesCategory =
+            categoryFilter === 'ALL' || e.category === categoryFilter;
+
+        return matchesSearch && matchesCategory;
+    });
 
     const openCreate = () => { setForm({ ...emptyForm }); setDialogMode('create'); setDialogOpen(true); };
     const openEdit = (ev) => {
@@ -169,6 +178,7 @@ export default function AdminEvents() {
         finally { setSaving(false); }
     };
 
+
     const handleDelete = async () => {
         try {
             setDeleting(true);
@@ -199,13 +209,38 @@ export default function AdminEvents() {
             {/* Search */}
             <Card className="mb-5 shadow-sm border-slate-100">
                 <CardContent className="p-3 flex flex-wrap items-center gap-3">
-                    <div className="relative flex-1 min-w-[200px] max-w-sm">
+                    <div className="relative flex-1 min-w-[220px] max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search events..." className="pl-9 h-9 text-sm" />
+                        <Input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search events..."
+                            className="pl-9 h-9 text-sm"
+                        />
                     </div>
-                    <span className="text-xs text-slate-400 ml-auto">{filtered.length} results</span>
+
+                    <div className="min-w-[220px]">
+                        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                            <SelectTrigger className="h-9 w-[180px] text-sm">
+                                <SelectValue placeholder="Filter by category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="ALL">All Categories</SelectItem>
+                                {EVENT_CATEGORIES.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                        {category}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <span className="ml-auto text-xs text-slate-400">
+                        {filtered.length} results
+                    </span>
                 </CardContent>
             </Card>
+
 
             {/* Table */}
             <Card className="shadow-sm border-slate-100 overflow-hidden">
@@ -280,6 +315,9 @@ export default function AdminEvents() {
                                             </td>
                                             <td className="px-5 py-3">
                                                 <div className="flex items-center justify-end gap-1">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-700" title="View event details" onClick={() => window.open(`/events/${ev.id}`, '_blank')}>
+                                                        <ExternalLink className="w-3.5 h-3.5" />
+                                                    </Button>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-700" onClick={() => openEdit(ev)}>
                                                         <Pencil className="w-3.5 h-3.5" />
                                                     </Button>

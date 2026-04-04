@@ -1,23 +1,35 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Clock, ChevronRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Calendar, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import FeaturedBanner from '@/components/events/FeaturedBanner';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
-import { motion } from "framer-motion";
 import EventCard from '@/components/cards/EventCard';
 
 const CATEGORIES = [
-    { value: 'ALL', label: 'All Events' },
+    { value: 'ALL', label: 'All Categories' },
     { value: 'FESTIVAL', label: 'Festival' },
     { value: 'CULTURAL', label: 'Cultural' },
     { value: 'EXHIBITION', label: 'Exhibition' },
     { value: 'CONCERT', label: 'Concert' },
     { value: 'SPORTS', label: 'Sports' },
     { value: 'RELIGIOUS', label: 'Religious' },
+    { value: 'WORKSHOP', label: 'Workshop' },
+    { value: 'FOOD', label: 'Food' },
+    { value: 'ART', label: 'Art' },
+    { value: 'WELLNESS', label: 'Wellness' },
+    { value: 'SPIRITUAL', label: 'Spiritual' },
+    { value: 'BUSINESS', label: 'Business' },
+    { value: 'TECH', label: 'Tech' },
+    { value: 'TREKKING', label: 'Trekking' },
     { value: 'OTHER', label: 'Other' },
 ];
 
@@ -27,40 +39,17 @@ const TIMEFRAMES = [
     { value: 'past', label: 'Past' },
 ];
 
-const CAT_COLORS = {
-    FESTIVAL: 'bg-orange-100 text-orange-700 border-orange-200',
-    CULTURAL: 'bg-pink-100   text-pink-700   border-pink-200',
-    EXHIBITION: 'bg-green-100  text-green-700  border-green-200',
-    CONCERT: 'bg-purple-100 text-purple-700 border-purple-200',
-    SPORTS: 'bg-blue-100   text-blue-700   border-blue-200',
-    RELIGIOUS: 'bg-amber-100  text-amber-700  border-amber-200',
-    WORKSHOP: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-    FOOD: 'bg-red-100 text-red-700 border-red-200',
-
-    ART: 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200',
-
-    WELLNESS: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    SPIRITUAL: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-
-    BUSINESS: 'bg-slate-100 text-slate-700 border-slate-200',
-    TECH: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-
-    TREKKING: 'bg-lime-100 text-lime-700 border-lime-200',
-
-    OTHER: 'bg-gray-100   text-gray-700   border-gray-200',
-
-};
-
-
-// Main Page 
 export default function Events() {
     const [activeTab, setActiveTab] = useState('upcoming');
     const [selectedCategory, setSelectedCategory] = useState('ALL');
+    const [searchQuery, setSearchQuery] = useState('');
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => { fetchEvents(); }, [activeTab, selectedCategory]);
+    useEffect(() => {
+        fetchEvents();
+    }, [activeTab]);
 
     const fetchEvents = async () => {
         try {
@@ -71,16 +60,13 @@ export default function Events() {
             const params = { page: 0, size: 30 };
 
             if (activeTab === 'ongoing') endpoint = apiEndpoints.CURRENT_EVENTS;
+
             if (activeTab === 'past') {
                 endpoint = apiEndpoints.SEARCH_EVENTS;
                 const past = new Date();
                 past.setMonth(past.getMonth() - 3);
                 params.endDate = new Date().toISOString().split('T')[0];
                 params.startDate = past.toISOString().split('T')[0];
-            }
-
-            if (selectedCategory !== 'ALL') {
-                params.category = selectedCategory;
             }
 
             const res = await axios.get(endpoint, { params });
@@ -93,75 +79,117 @@ export default function Events() {
         }
     };
 
-    const featured = events[0] ?? null;
-    const gridEvents = events.slice(1);
+    const filteredEvents = events.filter((event) => {
+        const matchesCategory =
+            selectedCategory === 'ALL' || event.category === selectedCategory;
 
-    const activeCategoryLabel = CATEGORIES.find(c => c.value === selectedCategory)?.label || 'All Events';
+        const q = searchQuery.toLowerCase();
+        const matchesSearch =
+            !searchQuery ||
+            event.name?.toLowerCase().includes(q) ||
+            event.city?.toLowerCase().includes(q) ||
+            event.category?.toLowerCase().includes(q);
+
+        return matchesCategory && matchesSearch;
+    });
+
+    const featured = filteredEvents[0] ?? null;
+    const gridEvents = filteredEvents.slice(1);
 
     return (
         <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Inter Tight', sans-serif" }}>
-            {/* Page Header */}
-            <div className="bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8">
-                    <h1 className="text-3xl font-bold text-[#1a2b38]">
-                        Explore Events
-                    </h1>
-                    <p className="text-gray-500 mt-1">Experience the culture and festivities across India.</p>
-                </div>
-            </div>
-
-            {/* Body */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8">
+                {/* <h1 className="text-3xl font-bold text-[#1a2b38]">Explore Events</h1>
+                <p className="mt-1 text-gray-500">
+                    Experience the culture and festivities across India.
+                </p> */}
 
-                {/* Main content */}
-                <div className="flex-1 min-w-0">
-                    {/* Timeframe */}
-                    <div className="flex items-center gap-2 mb-6">
-                        {TIMEFRAMES.map(t => (
-                            <button
-                                key={t.value}
-                                onClick={() => setActiveTab(t.value)}
-                                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all
-                                ${activeTab === t.value
-                                        ? "bg-teal-600 text-white shadow-sm"
-                                        : "bg-white border border-gray-200 text-gray-600 hover:border-teal-400"}
-                                `}
-                            >
-                                {t.label}
-                            </button>
-                        ))}
-                    </div>
-                    {/* Featured Event */}
-                    {!loading && !error && featured && <FeaturedBanner event={featured} />}
-                    {loading && <Skeleton className="h-[260px] w-full rounded-2xl mb-8" />}
-
-                    {/* Category pills */}
-                    <div className="flex gap-2 overflow-x-auto pb-1 mb-6 scrollbar-hide">
-                        {CATEGORIES.map(cat => (
-                            <button
-                                key={cat.value}
-                                onClick={() => setSelectedCategory(cat.value)}
-                                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold border transition-all ${selectedCategory === cat.value
-                                    ? 'bg-teal-600 hover:bg-teal-700 text-white border-teal-600 shadow-sm'
-                                    : 'bg-white text-gray-600 border-gray-200 hover:border-teal-400 hover:text-teal-700'
-                                    }`}
-                            >
-                                {cat.label}
-                            </button>
-                        ))}
+                {/* Featured Events */}
+                <div className="mt-4">
+                    <div className="mb-4 flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-[#1a2b38]">Featured Events</h2>
                     </div>
 
-                    {/* Section heading */}
-                    {!loading && !error && gridEvents.length > 0 && (
-                        <h2 className="text-xl font-bold text-[#1a2b38] mb-5">
-                            {activeCategoryLabel}
-                        </h2>
-                    )}
-
-                    {/* Grid */}
                     {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
+                        <Skeleton className="h-[260px] w-full rounded-2xl" />
+                    ) : error ? null : featured ? (
+                        <FeaturedBanner event={featured} />
+                    ) : (
+                        <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-gray-500">
+                            No featured event available.
+                        </div>
+                    )}
+                </div>
+
+                {/* Time frame + Search + Filter */}
+                <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.06)] sm:p-6">
+                    <div className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h3 className="mt-1 text-xl font-semibold text-slate-900">
+                                    Search Events
+                                </h3>
+                            </div>
+
+                            <div className="inline-flex w-fit items-center rounded-full bg-slate-100 p-1">
+                                {TIMEFRAMES.map((t) => (
+                                    <button
+                                        key={t.value}
+                                        onClick={() => setActiveTab(t.value)}
+                                        className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${activeTab === t.value
+                                            ? 'bg-slate-900 text-white shadow-sm'
+                                            : 'text-slate-600 hover:text-slate-900'
+                                            }`}
+                                    >
+                                        {t.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
+                            <div className="relative">
+                                <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search events or cities..."
+                                    className="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-14 pr-4 text-[15px] text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-teal-500 focus:bg-white"
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                    <SelectTrigger className="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 text-[15px] text-slate-700 shadow-none transition-all focus:border-teal-500 focus:bg-white">
+                                        <SelectValue placeholder="All Categories" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {CATEGORIES.map((cat) => (
+                                            <SelectItem key={cat.value} value={cat.value}>
+                                                {cat.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                {/* All Events */}
+                <div className="mt-8">
+                    <div className="mb-5 flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-[#1a2b38]">All Events</h2>
+                        {!loading && !error && (
+                            <p className="text-sm text-gray-500">{filteredEvents.length} events</p>
+                        )}
+                    </div>
+
+                    {loading ? (
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
                                 <div key={i} className="space-y-3">
                                     <Skeleton className="h-44 w-full rounded-2xl" />
                                     <Skeleton className="h-4 w-3/4" />
@@ -170,27 +198,27 @@ export default function Events() {
                             ))}
                         </div>
                     ) : error ? (
-                        <div className="text-center py-20">
-                            <Calendar className="h-14 w-14 mx-auto text-gray-300 mb-4" />
-                            <h3 className="font-semibold text-lg text-gray-600 mb-2">Failed to load events</h3>
-                            <p className="text-gray-500 mb-6">{error}</p>
-                            <Button onClick={fetchEvents} className="bg-teal-600 hover:bg-teal-700 text-white">
+                        <div className="py-20 text-center">
+                            <Calendar className="mx-auto mb-4 h-14 w-14 text-gray-300" />
+                            <h3 className="mb-2 text-lg font-semibold text-gray-600">
+                                Failed to load events
+                            </h3>
+                            <p className="mb-6 text-gray-500">{error}</p>
+                            <Button onClick={fetchEvents} className="bg-teal-600 text-white hover:bg-teal-700">
                                 Try Again
                             </Button>
                         </div>
-                    ) : gridEvents.length === 0 && !featured ? (
-                        <div className="text-center py-20">
-                            <Calendar className="h-14 w-14 mx-auto text-gray-300 mb-4" />
-                            <h3 className="font-semibold text-lg text-gray-600">No events found</h3>
-                            <p className="text-gray-500 mt-1">
-                                {selectedCategory !== 'ALL'
-                                    ? `No ${activeCategoryLabel.toLowerCase()} events available.`
-                                    : 'Check back later for upcoming events.'}
+                    ) : filteredEvents.length === 0 ? (
+                        <div className="py-20 text-center">
+                            <Calendar className="mx-auto mb-4 h-14 w-14 text-gray-300" />
+                            <h3 className="text-lg font-semibold text-gray-600">No events found</h3>
+                            <p className="mt-1 text-gray-500">
+                                Try another search or category.
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {gridEvents.map(event => (
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                            {filteredEvents.map((event) => (
                                 <EventCard key={event.id} event={event} />
                             ))}
                         </div>
@@ -200,6 +228,3 @@ export default function Events() {
         </div>
     );
 }
-
-
-

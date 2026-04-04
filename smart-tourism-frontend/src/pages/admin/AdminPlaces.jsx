@@ -12,7 +12,7 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Pencil, Trash2, RotateCcw, Loader2, Star, MapPin, Search, SlidersHorizontal } from 'lucide-react';
+import { Plus, Pencil, Trash2, RotateCcw, Loader2, Star, MapPin, Search, SlidersHorizontal, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
@@ -84,7 +84,6 @@ export default function AdminPlaces() {
                 setPlaces(d?.content || (Array.isArray(d) ? d : []));
                 setTotalPages(d?.totalPages || 1);
             } catch {
-                // Fall back to public endpoint — include same category/page params
                 const fallbackParams = { page, size: 20 };
                 if (categoryFilter !== 'ALL') fallbackParams.category = categoryFilter;
                 const res = await axios.get(apiEndpoints.GET_PLACES, { params: fallbackParams });
@@ -97,16 +96,20 @@ export default function AdminPlaces() {
 
     useEffect(() => { fetchPlaces(); }, [fetchPlaces]);
 
-    const filtered = search
-        ? places.filter(p =>
+    const filtered = places.filter((p) => {
+        const matchesSearch =
+            !search ||
             p.name?.toLowerCase().includes(search.toLowerCase()) ||
-            p.city?.toLowerCase().includes(search.toLowerCase())
-        ) : places;
+            p.city?.toLowerCase().includes(search.toLowerCase()) ||
+            p.state?.toLowerCase().includes(search.toLowerCase());
 
+        const matchesCategory = categoryFilter === 'ALL' || p.category === categoryFilter;
+
+        return matchesSearch && matchesCategory;
+    })
     const openCreate = () => { setForm({ ...emptyForm }); setDialogMode('create'); setDialogOpen(true); };
 
     const openEdit = async (p) => {
-        // Start with basic data from list immediately so dialog opens fast
         setDialogMode('edit');
         setDialogOpen(true);
         const placeholderPhotos = p.imageUrls || (p.imageUrl ? [p.imageUrl] : []);
@@ -117,7 +120,6 @@ export default function AdminPlaces() {
             photos: placeholderPhotos, openingHours: p.openingHours || '', entryFee: p.entryFee || '',
         });
 
-        // Then fetch full details to get all imageUrls
         try {
             const res = await axios.get(apiEndpoints.GET_PLACE_BY_ID(p.id));
             const full = res.data;
@@ -126,7 +128,7 @@ export default function AdminPlaces() {
                     : (full.imageUrl ? [full.imageUrl] : []);
             setForm(prev => ({ ...prev, photos }));
         } catch {
-            // keep the placeholder photos already set
+
         }
     };
 
@@ -284,15 +286,18 @@ export default function AdminPlaces() {
                                             </td>
                                             <td className="px-5 py-3">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-700" onClick={() => openEdit(p)}>
+                                                    <Button variant='ghost' size='icon' className='h-8 w-8 text-slate-400 hover:text-slate-700 hover:bg-slate-100' onClick={() => window.open(`/places/${p.id}`, '_blank')}>
+                                                        <ExternalLink className='w-3.5 h-3.5' />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-700 hover:bg-slate-100" onClick={() => openEdit(p)}>
                                                         <Pencil className="w-3.5 h-3.5" />
                                                     </Button>
                                                     {p.deleted ? (
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-600" onClick={() => handleRestore(p.id)}>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-gray-500 hover:bg-slate-100" onClick={() => handleRestore(p.id)}>
                                                             <RotateCcw className="w-3.5 h-3.5" />
                                                         </Button>
                                                     ) : (
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500" onClick={() => { setDeleteTarget(p); setDeleteDialogOpen(true); }}>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-slate-100" onClick={() => { setDeleteTarget(p); setDeleteDialogOpen(true); }}>
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </Button>
                                                     )}

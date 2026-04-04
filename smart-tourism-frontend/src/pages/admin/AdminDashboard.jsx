@@ -23,7 +23,7 @@ const MODULES = [
 const STATUS_ITEMS = [
     { label: 'Backend API', status: 'Operational', ok: true },
     { label: 'Database', status: 'Connected', ok: true },
-    { label: 'Google Maps', status: 'Development Mode', ok: false },
+    { label: 'Google Maps', status: 'Connected', ok: true },
     { label: 'WebSocket', status: 'Active', ok: true },
 ];
 
@@ -45,129 +45,181 @@ export default function AdminDashboard() {
         }).finally(() => setLoading(false));
     }, []);
 
-    const now = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const now = new Date().toLocaleDateString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    const statCards = [
+        { label: 'Total Places', value: stats.places, icon: MapPin, color: 'text-blue-700', bg: 'bg-blue-50', ring: 'ring-blue-100' },
+        { label: 'Total Events', value: stats.events, icon: Calendar, color: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-100' },
+        { label: 'Reviews', value: '—', icon: MessageSquare, color: 'text-amber-700', bg: 'bg-amber-50', ring: 'ring-amber-100' },
+        { label: 'Emergency Svcs', value: '—', icon: Siren, color: 'text-red-700', bg: 'bg-red-50', ring: 'ring-red-100' },
+    ];
 
     return (
-        <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-            {/* Page Header */}
-            <div className="mb-8">
-                <div className="flex items-start justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">
-                            Hello, {user?.username || 'Admin'}
-                        </h1>
-                        <p className="text-slate-500 mt-1 text-sm">{now}</p>
+        <div className="min-h-screen bg-slate-50">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                {/* Header */}
+                <div className="mb-8 rounded-3xl border border-slate-200 bg-white px-6 py-6 shadow-sm sm:px-8">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                Admin Overview
+                            </p>
+                            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+                                Hello, {user?.username || 'Admin'}
+                            </h1>
+                            <p className="mt-2 text-sm text-slate-500">{now}</p>
+                        </div>
+
+                        <div className="flex items-center gap-3 self-start rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-emerald-700">All Systems Online</p>
+                                <p className="text-xs text-emerald-600/80">Everything is running normally</p>
+                            </div>
+                        </div>
                     </div>
-                    <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-xs font-medium px-2.5 py-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 inline-block" />
-                        All Systems Online
-                    </Badge>
                 </div>
-            </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                {[
-                    { label: 'Total Places', value: stats.places, icon: MapPin, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-                    { label: 'Total Events', value: stats.events, icon: Calendar, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
-                    { label: 'Reviews', value: '—', icon: MessageSquare, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
-                    { label: 'Emergency Svcs', value: '—', icon: Siren, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
-                ].map((s) => {
-                    const Icon = s.icon;
-                    return (
-                        <Card key={s.label} className={`border shadow-sm hover:shadow-md transition-shadow ${s.border}`}>
-                            <CardContent className="p-5">
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className={`w-9 h-9 rounded-lg ${s.bg} flex items-center justify-center`}>
-                                        <Icon className={`w-4.5 h-4.5 ${s.color}`} />
+                {/* Stats */}
+                <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    {statCards.map((s) => {
+                        const Icon = s.icon;
+                        return (
+                            <Card
+                                key={s.label}
+                                className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md`}
+                            >
+                                <CardContent className="p-5">
+                                    <div className="mb-5 flex items-start justify-between">
+                                        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${s.bg} ring-1 ${s.ring}`}>
+                                            <Icon className={`h-5 w-5 ${s.color}`} />
+                                        </div>
+                                        <div className="rounded-full bg-slate-100 p-2">
+                                            <TrendingUp className="h-4 w-4 text-slate-400" />
+                                        </div>
                                     </div>
-                                    <TrendingUp className="w-4 h-4 text-slate-300" />
-                                </div>
-                                <p className="text-2xl font-bold text-slate-900">
-                                    {loading ? <span className="inline-block w-10 h-7 bg-slate-100 rounded animate-pulse" /> : s.value}
-                                </p>
-                                <p className="text-xs text-slate-500 mt-1 font-medium">{s.label}</p>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
-            </div>
 
-            {/* Module Grid + Status */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Modules — spans 2 cols */}
-                <div className="lg:col-span-2">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-base font-semibold text-slate-800">Admin Modules</h2>
-                        <p className="text-xs text-slate-400">6 modules available</p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {MODULES.map((mod) => {
-                            const Icon = mod.icon;
-                            return (
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                                            {s.label}
+                                        </p>
+                                        <p className="text-3xl font-bold tracking-tight text-slate-950">
+                                            {loading ? (
+                                                <span className="inline-block h-8 w-14 animate-pulse rounded bg-slate-100" />
+                                            ) : s.value}
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+
+                {/* Main grid */}
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.5fr_0.9fr]">
+                    {/* Modules */}
+                    <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                        <div className="mb-5 flex items-center justify-between">
+                            <div>
+                                <h2 className="text-lg font-semibold text-slate-900">Admin Modules</h2>
+                                <p className="mt-1 text-sm text-slate-500">Core areas you manage every day</p>
+                            </div>
+                            <Badge className="border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600 hover:bg-slate-50">
+                                {MODULES.length} Modules
+                            </Badge>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                            {MODULES.map((mod) => (
                                 <button
                                     key={mod.path}
                                     onClick={() => navigate(mod.path)}
-                                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-100 shadow-sm text-left hover:shadow-md hover:border-slate-200 hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer w-full"
+                                    className="group flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition-all hover:border-slate-300 hover:bg-white hover:shadow-sm"
                                 >
-                                    <div className={`w-10 h-10 rounded-lg ${mod.bg} flex items-center justify-center shrink-0`}>
-                                        <Icon className={`w-5 h-5 ${mod.color}`} />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-sm font-semibold text-slate-900">{mod.label}</p>
+                                        <p className="mt-1 text-xs leading-5 text-slate-500">{mod.desc}</p>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[13.5px] font-semibold text-slate-800">{mod.label}</p>
-                                        <p className="text-[11px] text-slate-400 mt-0.5">{mod.desc}</p>
-                                    </div>
-                                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+
+                                    <ArrowRight className="ml-4 h-4 w-4 shrink-0 text-slate-300 transition-all group-hover:translate-x-0.5 group-hover:text-slate-500" />
                                 </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* System Status */}
-                <div>
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-base font-semibold text-slate-800">System Status</h2>
-                        <Activity className="w-4 h-4 text-slate-300" />
-                    </div>
-                    <Card className="border-slate-100 shadow-sm">
-                        <CardContent className="p-4 space-y-3">
-                            {STATUS_ITEMS.map((s) => (
-                                <div key={s.label} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${s.ok ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                                        <span className="text-sm text-slate-600">{s.label}</span>
-                                    </div>
-                                    <span className={`text-xs font-medium ${s.ok ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                        {s.status}
-                                    </span>
-                                </div>
                             ))}
-                        </CardContent>
-                    </Card>
+                        </div>
 
-                    {/* Quick actions */}
-                    <div className="mt-4 space-y-2">
-                        <Button
-                            onClick={() => navigate('/admin/places')}
-                            className="w-full justify-start gap-3 bg-indigo-600 hover:bg-indigo-700 text-white h-10"
-                        >
-                            <MapPin className="w-4 h-4" /> Add New Place
-                        </Button>
-                        <Button
-                            onClick={() => navigate('/admin/events')}
-                            variant="outline"
-                            className="w-full justify-start gap-3 h-10 border-slate-200"
-                        >
-                            <Calendar className="w-4 h-4 text-violet-500" /> Add New Event
-                        </Button>
-                        <Button
-                            onClick={() => navigate('/admin/notifications')}
-                            variant="outline"
-                            className="w-full justify-start gap-3 h-10 border-slate-200"
-                        >
-                            <Bell className="w-4 h-4 text-emerald-500" /> Send Notification
-                        </Button>
+                    </section>
+
+                    {/* Right column */}
+                    <div className="space-y-6">
+                        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                            <div className="mb-5 flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-lg font-semibold text-slate-900">System Status</h2>
+                                    <p className="mt-1 text-sm text-slate-500">Service health and integrations</p>
+                                </div>
+                                <div className="rounded-full bg-slate-100 p-2">
+                                    <Activity className="h-4 w-4 text-slate-500" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                {STATUS_ITEMS.map((s) => (
+                                    <div
+                                        key={s.label}
+                                        className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className={`h-2.5 w-2.5 rounded-full ${s.ok ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                            <span className="text-sm font-medium text-slate-700">{s.label}</span>
+                                        </div>
+                                        <span className={`text-xs font-semibold ${s.ok ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                            {s.status}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                            <div className="mb-5">
+                                <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
+                                <p className="mt-1 text-sm text-slate-500">Common admin shortcuts</p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <Button
+                                    onClick={() => navigate('/admin/places')}
+                                    className="h-12 w-full justify-start rounded-2xl bg-slate-900 px-4 text-white hover:bg-slate-800"
+                                >
+                                    <MapPin className="mr-3 h-4 w-4" />
+                                    Add New Place
+                                </Button>
+
+                                <Button
+                                    onClick={() => navigate('/admin/events')}
+                                    variant="outline"
+                                    className="h-12 w-full justify-start rounded-2xl bg-slate-900 px-4 text-white hover:bg-slate-800"
+                                >
+                                    <Calendar className="mr-3 h-4 w-4 text-violet-600" />
+                                    Add New Event
+                                </Button>
+
+                                <Button
+                                    onClick={() => navigate('/admin/notifications')}
+                                    variant="outline"
+                                    className="h-12 w-full justify-start rounded-2xl bg-slate-900 px-4 text-white hover:bg-slate-800"
+                                >
+                                    <Bell className="mr-3 h-4 w-4 text-emerald-600" />
+                                    Send Notification
+                                </Button>
+                            </div>
+                        </section>
                     </div>
                 </div>
             </div>

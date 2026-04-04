@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -209,7 +211,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventSummaryDto> pagedEvents = events.subList(start, end)
                 .stream()
-                .map(eventMapper::toSummaryDto)
+                .map(e -> eventMapper.toSummaryDto(e))
                 .toList();
 
         return new org.springframework.data.domain.PageImpl<>(
@@ -301,5 +303,83 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new EventNotFoundException(id));
         event.setDeleted(true);
         eventRepository.save(event);
+    }
+
+    // ── Similar Events ────────────────────────────────────────────────────────
+
+    /** Hindi + English stop words to ignore during keyword extraction */
+    private static final Set<String> STOP_WORDS = Set.of(
+            "wali", "wala", "wale", "ka", "ke", "ki", "ko", "se", "mein", "par",
+            "aur", "ya", "the", "a", "an", "of", "in", "at", "on", "and", "or",
+            "for", "to", "with", "by", "is", "are", "was", "be", "as");
+
+    /**
+     * Extract meaningful keywords from an event name.
+     * "Phoolon wali Holi" → ["phoolon", "holi"]
+     */
+    private Set<String> extractKeywords(String name) {
+        if (name == null || name.isBlank())
+            return Collections.emptySet();
+        return Arrays.stream(name.toLowerCase().split("[\\s\\-_,./]+"))
+                .map(String::trim)
+                .filter(w -> w.length() > 2) // skip very short words
+                .filter(w -> !STOP_WORDS.contains(w)) // remove stop words
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventSummaryDto> getSimilarEvents(Long eventId, int limit) {
+        log.info("Finding similar events for eventId: {}", eventId);
+
+        Event source = eventRepository.findByIdAndDeletedFalse(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        LocalDate today = LocalDate.now();
+        Set<String> sourceKeywords = extractKeywords(source.getName());
+
+        // 1. Fetch same-category candidates
+        List<Event> categoryMatches = eventRepository
+                .findSimilarByCategory(eventId, source.getCategory(), today);
+
+        // 2. Fetch keyword candidates (run a DB LIKE for each keyword, merge)
+        Set<Long> seen = new HashSet<>();
+        Map<Long, Event> candidateMap = new LinkedHashMap<>();
+
+        categoryMatches.forEach(e -> {
+            seen.add(e.getId());
+            candidateMap.put(e.getId(), e);
+        });
+
+        sourceKeywords.forEach(kw -> {
+            List<Event> kwMatches = eventRepository.findByNameKeyword(eventId, kw, today);
+            kwMatches.forEach(e -> {
+                if (!seen.contains(e.getId())) {
+                    seen.add(e.getId());
+                    candidateMap.put(e.getId(), e);
+                }
+            });
+        });
+
+        // 3. Score and sort
+        // High=2 (category + keyword), Medium=1 (keyword only), Low=0 (category only)
+        return candidateMap.values().stream()
+                .map(candidate -> {
+                    int score = 0;
+                    boolean sameCategory = candidate.getCategory() == source.getCategory();
+                    Set<String> candidateKw = extractKeywords(candidate.getName());
+                    boolean hasCommonKeyword = candidateKw.stream().anyMatch(sourceKeywords::contains);
+
+                    if (sameCategory)
+                        score += 1;
+                    if (hasCommonKeyword)
+                        score += 2; // keyword match weighs more
+
+                    return Map.entry(candidate, score);
+                })
+                .sorted(Map.Entry.<Event, Integer>comparingByValue().reversed())
+                .limit(limit)
+                .map(e -> eventMapper.toSummaryDto(e.getKey()))
+                .collect(Collectors.toList());
     }
 }

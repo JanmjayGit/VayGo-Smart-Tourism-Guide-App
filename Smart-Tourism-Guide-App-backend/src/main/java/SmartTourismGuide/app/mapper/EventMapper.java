@@ -133,6 +133,12 @@ public class EventMapper {
                 .venue(event.getVenue())
                 .isFree(event.getIsFree())
                 .imageUrl(event.getImageUrl())
+                .imageUrls(
+                        event.getImages()
+                                .stream()
+                                .map(img -> img.getImageUrl())
+                                .toList()
+                )
                 .build();
     }
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,4 +26,5 @@ public class EventSummaryDto implements Serializable {
     private String venue;
     private Boolean isFree;
     private String imageUrl;
+    private List<String> imageUrls;
 }

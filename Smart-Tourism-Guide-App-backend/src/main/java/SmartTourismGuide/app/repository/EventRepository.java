@@ -89,4 +89,25 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         // ── Moderation queries ────────────────────────────────────────────────
         @Query("SELECT e FROM Event e WHERE e.verified = false AND e.deleted = false ORDER BY e.createdAt DESC")
         Page<Event> findPendingEvents(Pageable pageable);
+
+        // ── Similar events queries ─────────────────────────────────────────────
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
+                        "AND e.id <> :excludeId " +
+                        "AND e.category = :category " +
+                        "AND e.eventDate >= :today " +
+                        "ORDER BY e.eventDate ASC")
+        List<Event> findSimilarByCategory(
+                        @Param("excludeId") Long excludeId,
+                        @Param("category") EventCategory category,
+                        @Param("today") LocalDate today);
+
+        @Query("SELECT e FROM Event e WHERE e.deleted = false AND e.verified = true " +
+                        "AND e.id <> :excludeId " +
+                        "AND e.eventDate >= :today " +
+                        "AND LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+                        "ORDER BY e.eventDate ASC")
+        List<Event> findByNameKeyword(
+                        @Param("excludeId") Long excludeId,
+                        @Param("keyword") String keyword,
+                        @Param("today") LocalDate today);
 }
