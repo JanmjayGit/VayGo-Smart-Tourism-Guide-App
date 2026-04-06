@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "rooms", indexes = {
@@ -41,6 +43,14 @@ public class Room {
 
     @Column(length = 500)
     private String description;
+
+    @Column(nullable = false)
+    private Integer capacity = 2;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "room_images", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "image_url", length = 1000)
+    private List<String> imageUrls = new ArrayList<>();
 
     @Column(length = 500)
     private String amenities; // JSON array string

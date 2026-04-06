@@ -161,23 +161,49 @@ export default function AdminAddHotel() {
             // 2. Create enabled room types
             if (hotelId) {
                 const enabledRooms = ROOM_TYPES.filter(t => rooms[t].enabled && rooms[t].price);
+                // for (const t of enabledRooms) {
+                //     try {
+                //         await axios.post(
+                //             apiEndpoints.ADMIN_ADD_ROOM(hotelId),
+                //             {
+                //                 roomType: t,
+                //                 pricePerNight: parseFloat(rooms[t].price),
+                //                 totalRooms: rooms[t].count ? parseInt(rooms[t].count) : 1,
+                //                 availableRooms: rooms[t].count ? parseInt(rooms[t].count) : 1,
+                //                 available: true,
+                //             },
+                //             { headers: { Authorization: `Bearer ${token}` } }
+                //         );
+                //     } catch {
+                //         toast.error(`${t} room type could not be saved. Hotel was created.`);
+                //     }
+                // }
+
                 for (const t of enabledRooms) {
                     try {
                         await axios.post(
                             apiEndpoints.ADMIN_ADD_ROOM(hotelId),
                             {
                                 roomType: t,
+                                totalRooms: rooms[t].count ? parseInt(rooms[t].count, 10) : 1,
                                 pricePerNight: parseFloat(rooms[t].price),
-                                totalRooms: rooms[t].count ? parseInt(rooms[t].count) : 1,
-                                availableRooms: rooms[t].count ? parseInt(rooms[t].count) : 1,
-                                available: true,
+                                capacity: 2,
+                                description: '',
+                                amenities: JSON.stringify([]),
+                                imageUrls: [],
                             },
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
-                    } catch {
-                        toast.error(`${t} room type could not be saved. Hotel was created.`);
+                    } catch (err) {
+                        console.error(`${t} room save error`, err.response?.data || err);
+                        toast.error(
+                            err.response?.data?.message ||
+                            err.response?.data ||
+                            `${t} room type could not be saved. Hotel was created.`
+                        );
                     }
                 }
+
             }
 
             setSubmitted(true);

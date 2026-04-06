@@ -338,7 +338,7 @@ public class EventServiceImpl implements EventService {
 
         // 1. Fetch same-category candidates
         List<Event> categoryMatches = eventRepository
-                .findSimilarByCategory(eventId, source.getCategory(), today);
+                .findSimilarByCategory(eventId, source.getCategory(), today, Pageable.unpaged()).getContent();
 
         // 2. Fetch keyword candidates (run a DB LIKE for each keyword, merge)
         Set<Long> seen = new HashSet<>();

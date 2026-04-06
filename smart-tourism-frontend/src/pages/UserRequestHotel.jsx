@@ -102,28 +102,46 @@ export default function UserRequestHotel() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post(apiEndpoints.REQUEST_HOTEL, {
-                name: form.name,
-                description: form.description,
-                location: form.location,
-                city: form.city,
-                address: form.address,
-                latitude: parseFloat(form.latitude),
-                longitude: parseFloat(form.longitude),
-                pricePerNight: parseFloat(form.pricePerNight),
-                starRating: form.starRating ? parseInt(form.starRating) : null,
-                phone: form.phone,
-                email: form.email,
-                imageUrl: imageUrls[0] || null,
-                imageUrls,
-                amenities: JSON.stringify(form.amenities),
-                verified: false,
-                rooms: ROOM_TYPES.filter(t => rooms[t].enabled && rooms[t].price).map(t => ({
-                    roomType: t,
-                    pricePerNight: parseFloat(rooms[t].price),
-                    available: true,
-                })),
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            // await axios.post(apiEndpoints.REQUEST_HOTEL, {
+            //     name: form.name,
+            //     description: form.description,
+            //     location: form.location,
+            //     city: form.city,
+            //     address: form.address,
+            //     latitude: parseFloat(form.latitude),
+            //     longitude: parseFloat(form.longitude),
+            //     pricePerNight: parseFloat(form.pricePerNight),
+            //     starRating: form.starRating ? parseInt(form.starRating) : null,
+            //     phone: form.phone,
+            //     email: form.email,
+            //     imageUrl: imageUrls[0] || null,
+            //     imageUrls,
+            //     amenities: JSON.stringify(form.amenities),
+            //     verified: false,
+            //     rooms: ROOM_TYPES.filter(t => rooms[t].enabled && rooms[t].price).map(t => ({
+            //         roomType: t,
+            //         pricePerNight: parseFloat(rooms[t].price),
+            //         available: true,
+            //     })),
+            // }, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.post(
+                apiEndpoints.REQUEST_HOTEL,
+                {
+                    name: form.name,
+                    description: form.description,
+                    city: form.city,
+                    address: form.address,
+                    latitude: parseFloat(form.latitude),
+                    longitude: parseFloat(form.longitude),
+                    pricePerNight: parseFloat(form.pricePerNight),
+                    imageUrl: imageUrls[0] || null,
+                    imageUrls,
+                    amenities: JSON.stringify(form.amenities),
+                    contactInfo: form.phone || null,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
             setSubmitted(true);
             toast.success('Hotel submitted! Pending admin verification.');
         } catch (err) {

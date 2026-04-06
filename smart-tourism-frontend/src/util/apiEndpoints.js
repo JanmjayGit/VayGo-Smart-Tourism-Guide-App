@@ -24,16 +24,31 @@ const apiEndpoints = {
     NEARBY_EVENTS: `${BASE_URL}/api/events/nearby`,
     EVENTS_BY_DATE_RANGE: `${BASE_URL}/api/events/date-range`,
 
+    // // Hotels
+    // SEARCH_HOTELS: `${BASE_URL}/api/hotels/search`,
+    // NEARBY_HOTELS: `${BASE_URL}/api/hotels/nearby`,
+    // GET_HOTEL_BY_ID: (id) => `${BASE_URL}/api/hotels/${id}`,
+    // HOTELS_BY_CITY: (city) => `${BASE_URL}/api/hotels/city/${city}`,
+    // HOTELS_BY_PRICE: `${BASE_URL}/api/hotels/price`,
+    // GET_HOTEL_ROOMS: (hotelId) => `${BASE_URL}/api/bookings/hotels/${hotelId}/rooms`,
+
+    // // Bookings
+    // CREATE_BOOKING: `${BASE_URL}/api/bookings`,
+    // GET_MY_BOOKINGS: `${BASE_URL}/api/bookings/my`,
+    // CANCEL_BOOKING: (id) => `${BASE_URL}/api/bookings/${id}/cancel`,
+
     // Hotels
     SEARCH_HOTELS: `${BASE_URL}/api/hotels/search`,
     NEARBY_HOTELS: `${BASE_URL}/api/hotels/nearby`,
     GET_HOTEL_BY_ID: (id) => `${BASE_URL}/api/hotels/${id}`,
     HOTELS_BY_CITY: (city) => `${BASE_URL}/api/hotels/city/${city}`,
     HOTELS_BY_PRICE: `${BASE_URL}/api/hotels/price`,
-    GET_HOTEL_ROOMS: (hotelId) => `${BASE_URL}/api/bookings/hotels/${hotelId}/rooms`,
+    GET_AVAILABLE_ROOMS: (hotelId) => `${BASE_URL}/api/hotels/${hotelId}/available-rooms`,
+    GET_HOTEL_ROOMS: (hotelId) => `${BASE_URL}/api/bookings/hotels/${hotelId}/rooms`, // keep only if still used in admin/legacy UI
 
     // Bookings
     CREATE_BOOKING: `${BASE_URL}/api/bookings`,
+    PAY_BOOKING: (id) => `${BASE_URL}/api/bookings/${id}/pay`,
     GET_MY_BOOKINGS: `${BASE_URL}/api/bookings/my`,
     CANCEL_BOOKING: (id) => `${BASE_URL}/api/bookings/${id}/cancel`,
 
@@ -127,6 +142,15 @@ const apiEndpoints = {
     ADMIN_VERIFY_EVENT: (id) => `${BASE_URL}/api/admin/events/${id}/verify`,
     ADMIN_REJECT_EVENT: (id) => `${BASE_URL}/api/admin/events/${id}/reject`,
 
+    // // Admin - Hotels
+    // ADMIN_CREATE_HOTEL: `${BASE_URL}/api/admin/hotels`,
+    // ADMIN_UPDATE_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}`,
+    // ADMIN_DELETE_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}`,
+    // ADMIN_UNVERIFIED_HOTELS: `${BASE_URL}/api/admin/hotels/unverified`,
+    // ADMIN_VERIFY_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}/verify`,
+    // ADMIN_REJECT_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}/reject`,
+    // ADMIN_ADD_ROOM: (hotelId) => `${BASE_URL}/api/admin/hotels/${hotelId}/rooms`,
+
     // Admin - Hotels
     ADMIN_CREATE_HOTEL: `${BASE_URL}/api/admin/hotels`,
     ADMIN_UPDATE_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}`,
@@ -135,6 +159,8 @@ const apiEndpoints = {
     ADMIN_VERIFY_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}/verify`,
     ADMIN_REJECT_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}/reject`,
     ADMIN_ADD_ROOM: (hotelId) => `${BASE_URL}/api/admin/hotels/${hotelId}/rooms`,
+    ADMIN_UPDATE_ROOM: (roomId) => `${BASE_URL}/api/admin/rooms/${roomId}`,
+    ADMIN_DELETE_ROOM: (roomId) => `${BASE_URL}/api/admin/rooms/${roomId}`,
 
     // Admin - Reviews
     ADMIN_DELETE_REVIEW: (id) => `${BASE_URL}/api/admin/reviews/${id}`,

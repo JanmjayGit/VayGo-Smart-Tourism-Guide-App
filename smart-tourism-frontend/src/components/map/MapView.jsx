@@ -126,58 +126,6 @@ export default function MapView({
                     fullscreenControl: true,
                 }}
             >
-                {/* {markers.map((marker, index) => (
-                    marker.latitude && marker.longitude && (
-                        <Marker
-                            key={marker.id || index}
-                            position={{ lat: marker.latitude, lng: marker.longitude }}
-                            onClick={() => handleMarkerClick(marker)}
-                            icon={{
-                                path: window.google.maps.SymbolPath.CIRCLE,
-                                scale: 10,
-                                fillColor: categoryColors[marker.category || marker.type] || '#D4745F',
-                                fillOpacity: 0.9,
-                                strokeColor: '#FFFFFF',
-                                strokeWeight: 3,
-                            }}
-                        />
-                    )
-                ))}
-
-                {showInfoWindows && selectedMarker && (
-                    <InfoWindow
-                        position={{
-                            lat: selectedMarker.latitude,
-                            lng: selectedMarker.longitude,
-                        }}
-                        onCloseClick={() => setSelectedMarker(null)}
-                    >
-                        <div className="p-2 max-w-[250px] font-body">
-                            <h4 className="font-display text-base font-bold text-[#2C3333] mb-1">
-                                {selectedMarker.name}
-                            </h4>
-                            {selectedMarker.category && (
-                                <span className="inline-block px-2 py-0.5 text-xs font-accent tracking-wider rounded bg-[#F5F1E8] text-[#4A5759] mb-2">
-                                    {selectedMarker.category}
-                                </span>
-                            )}
-                            {selectedMarker.averageRating > 0 && (
-                                <div className="flex items-center gap-1 mb-2">
-                                    <Star className="w-3.5 h-3.5 fill-[#C9A961] text-[#C9A961]" />
-                                    <span className="text-xs text-[#4A5759]">
-                                        {selectedMarker.averageRating.toFixed(1)}
-                                    </span>
-                                </div>
-                            )}
-                            <button
-                                onClick={() => handleViewDetails(selectedMarker)}
-                                className="w-full text-center text-xs font-accent tracking-wider text-[#D4745F] hover:text-[#B85D48] py-1.5 border border-[#D4745F] rounded cursor-pointer transition-colors"
-                            >
-                                VIEW DETAILS
-                            </button>
-                        </div>
-                    </InfoWindow>
-                )} */}
             </GoogleMap>
         </div>
     );

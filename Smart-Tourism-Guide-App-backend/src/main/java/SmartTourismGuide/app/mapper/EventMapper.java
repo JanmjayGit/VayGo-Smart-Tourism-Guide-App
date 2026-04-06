@@ -7,6 +7,8 @@ import SmartTourismGuide.app.dto.response.EventSummaryDto;
 import SmartTourismGuide.app.entity.Event;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class EventMapper {
 
@@ -116,7 +118,7 @@ public class EventMapper {
                                 ? event.getImages().stream()
                                         .map(img -> img.getImageUrl())
                                         .toList()
-                                : List.of())
+                                :List.of())
                 .websiteUrl(event.getWebsiteUrl())
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())

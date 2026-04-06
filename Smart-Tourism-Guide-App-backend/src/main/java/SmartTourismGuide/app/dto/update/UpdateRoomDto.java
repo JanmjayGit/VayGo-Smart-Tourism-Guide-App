@@ -1,4 +1,4 @@
-package SmartTourismGuide.app.dto.request;
+package SmartTourismGuide.app.dto.update;
 
 import SmartTourismGuide.app.enums.RoomType;
 import jakarta.validation.constraints.Min;
@@ -9,9 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class CreateRoomDto {
-
-    private Long hotelId;
+public class UpdateRoomDto {
 
     @NotNull
     private RoomType roomType;
@@ -23,11 +21,11 @@ public class CreateRoomDto {
     private BigDecimal pricePerNight;
 
     private String description;
+
     @Min(1)
     private Integer capacity = 2;
 
     private List<String> imageUrls;
 
-
-    private String amenities; // JSON string
+    private String amenities;
 }
