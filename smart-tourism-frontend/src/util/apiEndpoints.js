@@ -24,18 +24,6 @@ const apiEndpoints = {
     NEARBY_EVENTS: `${BASE_URL}/api/events/nearby`,
     EVENTS_BY_DATE_RANGE: `${BASE_URL}/api/events/date-range`,
 
-    // // Hotels
-    // SEARCH_HOTELS: `${BASE_URL}/api/hotels/search`,
-    // NEARBY_HOTELS: `${BASE_URL}/api/hotels/nearby`,
-    // GET_HOTEL_BY_ID: (id) => `${BASE_URL}/api/hotels/${id}`,
-    // HOTELS_BY_CITY: (city) => `${BASE_URL}/api/hotels/city/${city}`,
-    // HOTELS_BY_PRICE: `${BASE_URL}/api/hotels/price`,
-    // GET_HOTEL_ROOMS: (hotelId) => `${BASE_URL}/api/bookings/hotels/${hotelId}/rooms`,
-
-    // // Bookings
-    // CREATE_BOOKING: `${BASE_URL}/api/bookings`,
-    // GET_MY_BOOKINGS: `${BASE_URL}/api/bookings/my`,
-    // CANCEL_BOOKING: (id) => `${BASE_URL}/api/bookings/${id}/cancel`,
 
     // Hotels
     SEARCH_HOTELS: `${BASE_URL}/api/hotels/search`,
@@ -73,9 +61,9 @@ const apiEndpoints = {
     UPDATE_REVIEW: (id) => `${BASE_URL}/api/reviews/${id}`,
     DELETE_REVIEW: (id) => `${BASE_URL}/api/reviews/${id}`,
     PLACE_REVIEWS: (placeId) => `${BASE_URL}/api/reviews/place/${placeId}`,
-    GET_REVIEWS_BY_PLACE: (placeId) => `${BASE_URL}/api/reviews/place/${placeId}`, // alias used by ReviewsSection
+    GET_REVIEWS_BY_PLACE: (placeId) => `${BASE_URL}/api/reviews/place/${placeId}`,
     PLACE_RATING_STATS: (placeId) => `${BASE_URL}/api/reviews/place/${placeId}/stats`,
-    GET_RATING_STATS: (placeId) => `${BASE_URL}/api/reviews/place/${placeId}/stats`, // alias used by ReviewsSection
+    GET_RATING_STATS: (placeId) => `${BASE_URL}/api/reviews/place/${placeId}/stats`,
     MY_REVIEWS: `${BASE_URL}/api/reviews/my-reviews`,
 
     // Weather
@@ -104,7 +92,15 @@ const apiEndpoints = {
     GET_PROFILE: `${BASE_URL}/api/profile`,
     UPDATE_PROFILE: `${BASE_URL}/api/profile`,
     USER_PREFERENCES: `${BASE_URL}/api/profile/preferences`,
+
+    // My Contributions (user-submitted content)
     GET_USER_CONTRIBUTIONS: `${BASE_URL}/api/user/contributions`,
+    MY_PLACES: `${BASE_URL}/api/places/my`,
+    MY_EVENTS: `${BASE_URL}/api/events/my`,
+    MY_HOTELS: `${BASE_URL}/api/hotels/my`,
+    USER_EDIT_PLACE: (id) => `${BASE_URL}/api/places/${id}/edit`,
+    USER_EDIT_EVENT: (id) => `${BASE_URL}/api/events/${id}/edit`,
+    USER_EDIT_HOTEL: (id) => `${BASE_URL}/api/hotels/${id}/edit`,
 
     // Hotel Reviews
     HOTEL_REVIEWS: (hotelId) => `${BASE_URL}/api/reviews/hotel/${hotelId}`,
@@ -142,15 +138,6 @@ const apiEndpoints = {
     ADMIN_VERIFY_EVENT: (id) => `${BASE_URL}/api/admin/events/${id}/verify`,
     ADMIN_REJECT_EVENT: (id) => `${BASE_URL}/api/admin/events/${id}/reject`,
 
-    // // Admin - Hotels
-    // ADMIN_CREATE_HOTEL: `${BASE_URL}/api/admin/hotels`,
-    // ADMIN_UPDATE_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}`,
-    // ADMIN_DELETE_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}`,
-    // ADMIN_UNVERIFIED_HOTELS: `${BASE_URL}/api/admin/hotels/unverified`,
-    // ADMIN_VERIFY_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}/verify`,
-    // ADMIN_REJECT_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}/reject`,
-    // ADMIN_ADD_ROOM: (hotelId) => `${BASE_URL}/api/admin/hotels/${hotelId}/rooms`,
-
     // Admin - Hotels
     ADMIN_CREATE_HOTEL: `${BASE_URL}/api/admin/hotels`,
     ADMIN_UPDATE_HOTEL: (id) => `${BASE_URL}/api/admin/hotels/${id}`,
@@ -174,6 +161,7 @@ const apiEndpoints = {
     EMERGENCY_CREATE: `${BASE_URL}/api/emergency`,
     EMERGENCY_UPDATE: (id) => `${BASE_URL}/api/emergency/${id}`,
     EMERGENCY_DELETE: (id) => `${BASE_URL}/api/emergency/${id}`,
+    GET_ALL_EMERGENCY: `${BASE_URL}/api/emergency`,
 };
 
 export default apiEndpoints;

@@ -67,8 +67,6 @@ public class AdminPlaceController {
         return ResponseEntity.ok(restoredPlace);
     }
 
-    // ── Moderation ─────────────────────────────────────────────────────
-
     @GetMapping("/pending")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<PlaceDetailsDto>> getPendingPlaces(

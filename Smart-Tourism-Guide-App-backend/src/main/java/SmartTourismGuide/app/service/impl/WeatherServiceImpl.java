@@ -33,6 +33,9 @@ public class WeatherServiceImpl implements WeatherService {
     @Value("${weather.api.key}")
     private String apiKey;
 
+    @Value("${weather.api.base-url}")
+    private String baseUrl;
+
     @Override
     @Cacheable(value = "weather", key = "#lat + ':' + #lon")
     public WeatherDto getWeatherByCoordinates(Double lat, Double lon) {
@@ -42,33 +45,27 @@ public class WeatherServiceImpl implements WeatherService {
         validateLongitude(lon);
 
         try {
-            // Call OpenWeatherMap API
             String url = String.format("/weather?lat=%s&lon=%s&appid=%s&units=metric",
                     lat, lon, apiKey);
+
+            log.info("Calling Weather API: {}", url);
+            log.info("Base URL: {}", baseUrl);
 
             OpenWeatherResponse response = weatherWebClient.get()
                     .uri(url)
                     .retrieve()
-                    .onStatus(status -> status.is4xxClientError(),
-                            clientResponse -> Mono.error(new WeatherApiException(
-                                    "Invalid request to weather API: " + clientResponse.statusCode())))
-                    .onStatus(status -> status.is5xxServerError(),
-                            clientResponse -> Mono.error(new WeatherApiException(
-                                    "Weather API server error: " + clientResponse.statusCode())))
                     .bodyToMono(OpenWeatherResponse.class)
                     .timeout(Duration.ofSeconds(5))
                     .block();
 
-            if (response == null) {
-                throw new WeatherApiException("Empty response from weather API");
+            if (response == null || response.getMain() == null) {
+                throw new WeatherApiException("Invalid response from weather API");
             }
 
-            // Transform to WeatherDto
             return transformToWeatherDto(response, false);
 
         } catch (Exception e) {
-            log.error("Error fetching weather data: {}", e.getMessage());
-            // Return fallback response
+            log.error("Weather API failed", e);
             return getFallbackWeather("Location (" + lat + ", " + lon + ")");
         }
     }

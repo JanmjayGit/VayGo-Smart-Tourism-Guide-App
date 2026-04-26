@@ -4,7 +4,7 @@ public enum PlaceCategory {
     ATTRACTION,
     MUSEUM,
     HISTORICAL_SITE,
-    RELIGIOUS_SITE,
+    TEMPLE,
     PARK,
     BEACH,
     HOTEL,
@@ -20,4 +20,5 @@ public enum PlaceCategory {
     SHOPPING_MALL,
     AIRPORT,
     HOSPITAL,
+    OTHER
 }

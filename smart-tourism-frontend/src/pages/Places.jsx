@@ -5,40 +5,69 @@ import CategoryFilter from '@/components/places/CategoryFilter';
 import PlacesGrid from '@/components/places/PlacesGrid';
 import MapView from '@/components/map/MapView';
 
+const HOTEL_CATS = new Set(['HOTEL', 'RESORT', 'HOSTEL']);
+
 export default function Places() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState(null);
+    const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
-    // Fetch from backend — category filter is API-side for performance
-    // Pass size=100 so we get enough to search locally
     const { places: allPlaces, loading, error, toggleFavorite } = usePlaces({
-        category: activeCategory || undefined,
         size: 100,
     });
 
-    // Hotel categories belong on the Hotels page — always exclude them here
-    const HOTEL_CATS = new Set(['HOTEL', 'RESORT', 'HOSTEL']);
 
-    // Client-side search + hotel exclusion
+    // debounce search
+    useEffect(() => {
+        const t = setTimeout(() => {
+            setDebouncedQuery(searchQuery);
+        }, 300);
+
+        return () => clearTimeout(t);
+    }, [searchQuery]);
+
+
     const places = useMemo(() => {
-        const tourist = allPlaces.filter(p => !HOTEL_CATS.has(p.category));
-        if (!searchQuery.trim()) return tourist;
-        const q = searchQuery.toLowerCase();
-        return tourist.filter(p =>
-            p.name?.toLowerCase().includes(q) ||
-            p.city?.toLowerCase().includes(q) ||
-            p.category?.toLowerCase().includes(q) ||
-            p.state?.toLowerCase().includes(q) ||
-            p.description?.toLowerCase().includes(q)
-        );
-    }, [allPlaces, searchQuery]);
+        const q = debouncedQuery.trim().toLowerCase();
+
+        return allPlaces
+            .filter(p => {
+                // normalize category safely
+                const category = p.category?.toUpperCase();
+
+                if (activeCategory && category !== activeCategory) {
+                    return false;
+                }
+
+                // remove hotels
+                if (HOTEL_CATS.has(category)) return false;
+
+                // no search then return all
+                if (!q) return true;
+
+                return (
+                    p.name?.toLowerCase().includes(q) ||
+                    p.city?.toLowerCase().includes(q) ||
+                    category?.toLowerCase().includes(q) ||
+                    p.state?.toLowerCase().includes(q) ||
+                    p.description?.toLowerCase().includes(q)
+                );
+            });
+    }, [allPlaces, debouncedQuery, activeCategory]);
 
     const resultLabel = () => {
         if (loading) return null;
-        const cat = activeCategory ? activeCategory.replace('_', ' ').toLowerCase() : '';
+        const cat = activeCategory
+            ? activeCategory.replace(/_/g, ' ').toLowerCase()
+            : '';
         const q = searchQuery ? ` matching "${searchQuery}"` : '';
         const catLabel = cat ? ` in ${cat}` : '';
         return `${places.length} place${places.length !== 1 ? 's' : ''}${catLabel}${q}`;
+    };
+
+    const handleCategoryChange = (cat) => {
+        setActiveCategory(cat);
+        setSearchQuery(''); // clear search when switching category
     };
 
     return (
@@ -47,15 +76,8 @@ export default function Places() {
             <PlacesHero
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
-            />
-
-            {/* Category Filter */}
-            <CategoryFilter
                 activeCategory={activeCategory}
-                onCategoryChange={(cat) => {
-                    setActiveCategory(cat);
-                    setSearchQuery(''); // clear search when switching category
-                }}
+                onCategoryChange={handleCategoryChange}
             />
 
             {/* Main Content */}

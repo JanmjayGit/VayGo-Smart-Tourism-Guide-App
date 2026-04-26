@@ -22,6 +22,8 @@ public class PlaceMapper {
                 .imageUrl(place.getImageUrl())
                 .priceRange(place.getPriceRange())
                 .address(place.getAddress())
+                .city(place.getCity())
+                .status(place.getStatus())
                 .build();
     }
 
@@ -78,6 +80,7 @@ public class PlaceMapper {
                 .priceRange(place.getPriceRange())
                 .createdAt(place.getCreatedAt())
                 .updatedAt(place.getUpdatedAt())
+                .status(place.getStatus())
                 .build();
     }
 
@@ -90,10 +93,4 @@ public class PlaceMapper {
                 .build();
     }
 
-    public static CoordinateDto toCoordinateDto(BigDecimal latitude, BigDecimal longitude) {
-        return CoordinateDto.builder()
-                .latitude(latitude)
-                .longitude(longitude)
-                .build();
-    }
 }

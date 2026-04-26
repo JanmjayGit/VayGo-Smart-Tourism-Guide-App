@@ -20,7 +20,6 @@ import ConfirmDialog from '@/components/admin/ConfirmDialog';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 
 
-// Must match backend EventCategory enum exactly
 const EVENT_CATEGORIES = [
     'FESTIVAL',
     'CULTURAL',
@@ -28,8 +27,6 @@ const EVENT_CATEGORIES = [
     'CONCERT',
     'SPORTS',
     'RELIGIOUS',
-
-    // NEW
     'WORKSHOP',
     'FOOD',
     'ART',
@@ -49,8 +46,6 @@ const CAT_STYLES = {
     CONCERT: 'bg-pink-50 text-pink-700 border-pink-200',
     SPORTS: 'bg-green-50 text-green-700 border-green-200',
     RELIGIOUS: 'bg-amber-50 text-amber-700 border-amber-200',
-
-    // NEW CATEGORIES
 
     WORKSHOP: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     FOOD: 'bg-red-50 text-red-700 border-red-200',
@@ -263,10 +258,10 @@ export default function AdminEvents() {
                         <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-3">
                             <Calendar className="w-6 h-6 text-slate-300" />
                         </div>
-                        <p className="font-medium text-slate-500">No events found</p>
+                        <p className="font-medium text-slate-500 text-lg">No events found</p>
                         <p className="text-sm mt-1">Try adjusting your search or add a new event</p>
-                        <Button onClick={openCreate} variant="outline" className="mt-4 gap-2">
-                            <Plus className="w-4 h-4" /> Add first event
+                        <Button onClick={openCreate} variant="outline" className="mt-4 gap-2 text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer">
+                            Add first event
                         </Button>
                     </CardContent>
                 ) : (
@@ -430,8 +425,8 @@ export default function AdminEvents() {
                     </div>
 
                     <DialogFooter className="pt-2">
-                        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 gap-2">
+                        <Button variant="outline" className='text-indigo-600 bg-indigo-50 border-indigo-500 hover:bg-indigo-100 hover:text-indigo-600 cursor-pointer' onClick={() => setDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 gap-2 cursor-pointer">
                             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                             {dialogMode === 'create' ? 'Create Event' : 'Save Changes'}
                         </Button>

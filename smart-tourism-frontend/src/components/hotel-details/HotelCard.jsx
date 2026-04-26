@@ -24,7 +24,7 @@ export default function HotelCard({ hotel }) {
             onKeyDown={(e) => e.key === "Enter" && navigate(`/hotels/${hotel.id}`)}
         >
             {/* Image */}
-            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100">
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 transistion-all duration-200 ease-out hover:-translate-y-3 hover:shadow-2xl">
                 {images[0] ? (
                     <img
                         src={images[0]}

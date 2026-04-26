@@ -1,6 +1,7 @@
 package SmartTourismGuide.app.dto.response;
 
 import SmartTourismGuide.app.enums.PlaceCategory;
+import SmartTourismGuide.app.enums.PlaceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,4 +27,6 @@ public class PlaceDto {
     private String address;
     private String city;
     private Long reviewCount; // populated from place.popularity (review count stored there)
+    private PlaceStatus status;
+
 }

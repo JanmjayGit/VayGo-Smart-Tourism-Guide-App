@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * DTO for creating a new hotel.
- */
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -67,4 +65,7 @@ public class CreateHotelDto {
 
     @lombok.Builder.Default
     private Boolean availabilityStatus = true;
+
+    private List<CreateRoomDto> rooms;
+
 }

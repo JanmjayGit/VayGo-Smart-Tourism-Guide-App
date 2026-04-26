@@ -70,7 +70,7 @@ export default function FeaturesSection() {
                         <span className="text-teal-500">Travel Companion</span>
                     </h2>
                     <p className="text-gray-500 mt-4 max-w-xl mx-auto text-base">
-                        From discovering hidden gems to navigating cities — VayGo has everything to make your journey seamless.
+                        From discovering hidden gems to navigating cities, VayGo has everything to make your journey seamless.
                     </p>
                 </div>
 

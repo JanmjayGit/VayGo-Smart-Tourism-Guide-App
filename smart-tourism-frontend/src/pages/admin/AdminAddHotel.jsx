@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
+import RoomRow from '@/components/admin/RoomRow';
 
 // Room type
 const ROOM_TYPES = ['STANDARD', 'DELUXE', 'SUITE', 'FAMILY'];
@@ -21,7 +22,7 @@ const AMENITIES = [
     'Pet Friendly', 'Rooftop Terrace', '24hr Front Desk', 'Airport Shuttle',
 ];
 
-// ─── Field helper — defined OUTSIDE the component so it never remounts ────────
+// Field helper
 function Field({ label, name, type = 'text', placeholder, required, hint, prefix, value, onChange, error }) {
     return (
         <div className="space-y-1.5">
@@ -47,43 +48,7 @@ function Field({ label, name, type = 'text', placeholder, required, hint, prefix
     );
 }
 
-// ─── Room row — also outside the component ───────────────────────────────────
-function RoomRow({ roomType, data, onChange }) {
-    return (
-        <div className="grid grid-cols-3 gap-3 py-3 border-b border-slate-100 last:border-0">
-            <div className="flex items-center gap-2">
-                <input
-                    type="checkbox"
-                    id={`room-${roomType}`}
-                    checked={data.enabled}
-                    onChange={e => onChange(roomType, 'enabled', e.target.checked)}
-                    className="w-4 h-4 accent-indigo-600"
-                />
-                <label htmlFor={`room-${roomType}`} className="text-sm font-medium text-slate-700 capitalize">
-                    {roomType.charAt(0) + roomType.slice(1).toLowerCase()}
-                </label>
-            </div>
-            <Input
-                type="number"
-                placeholder="Price / night"
-                disabled={!data.enabled}
-                value={data.price}
-                onChange={e => onChange(roomType, 'price', e.target.value)}
-                className="rounded-lg border-slate-200 h-9 text-sm"
-            />
-            <Input
-                type="number"
-                placeholder="# of rooms"
-                disabled={!data.enabled}
-                value={data.count}
-                onChange={e => onChange(roomType, 'count', e.target.value)}
-                className="rounded-lg border-slate-200 h-9 text-sm"
-            />
-        </div>
-    );
-}
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function AdminAddHotel() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -98,9 +63,18 @@ export default function AdminAddHotel() {
         amenities: [],
     });
 
-    // Room types state: one entry per type
     const [rooms, setRooms] = useState(
-        ROOM_TYPES.reduce((acc, t) => ({ ...acc, [t]: { enabled: false, price: '', count: '' } }), {})
+        ROOM_TYPES.reduce((acc, t) => ({
+            ...acc,
+            [t]: {
+                enabled: false,
+                price: '',
+                count: '',
+                capacity: '2',
+                description: '',
+                imageUrls: [],
+            },
+        }), {})
     );
 
     const handleChange = (e) => {
@@ -161,23 +135,6 @@ export default function AdminAddHotel() {
             // 2. Create enabled room types
             if (hotelId) {
                 const enabledRooms = ROOM_TYPES.filter(t => rooms[t].enabled && rooms[t].price);
-                // for (const t of enabledRooms) {
-                //     try {
-                //         await axios.post(
-                //             apiEndpoints.ADMIN_ADD_ROOM(hotelId),
-                //             {
-                //                 roomType: t,
-                //                 pricePerNight: parseFloat(rooms[t].price),
-                //                 totalRooms: rooms[t].count ? parseInt(rooms[t].count) : 1,
-                //                 availableRooms: rooms[t].count ? parseInt(rooms[t].count) : 1,
-                //                 available: true,
-                //             },
-                //             { headers: { Authorization: `Bearer ${token}` } }
-                //         );
-                //     } catch {
-                //         toast.error(`${t} room type could not be saved. Hotel was created.`);
-                //     }
-                // }
 
                 for (const t of enabledRooms) {
                     try {
@@ -187,10 +144,10 @@ export default function AdminAddHotel() {
                                 roomType: t,
                                 totalRooms: rooms[t].count ? parseInt(rooms[t].count, 10) : 1,
                                 pricePerNight: parseFloat(rooms[t].price),
-                                capacity: 2,
-                                description: '',
+                                capacity: rooms[t].capacity ? parseInt(rooms[t].capacity, 10) : 2,
+                                description: rooms[t].description || '',
                                 amenities: JSON.stringify([]),
-                                imageUrls: [],
+                                imageUrls: rooms[t].imageUrls || [],
                             },
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
@@ -344,7 +301,7 @@ export default function AdminAddHotel() {
 
                 {/* Submit */}
                 <div className="flex gap-3">
-                    <Button type="button" variant="outline" className="rounded-lg flex-1" onClick={() => navigate(-1)}>
+                    <Button type="button" variant="outline" className="rounded-lg flex-1 bg-indigo-100 text-indigo-600 border-2 border-indigo-600 hover:bg-indigo-200 hover:text-indigo-600" onClick={() => navigate(-1)}>
                         Cancel
                     </Button>
                     <Button type="submit" disabled={loading} className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-2.5 font-semibold">

@@ -108,4 +108,6 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
         WHERE h.deleted = false
     """)
     Page<Object[]> findHotelsWithUser(Pageable pageable);
+
+    List<Hotel> findBySubmittedByUserIdAndDeletedFalseOrderByCreatedAtDesc(Long submittedByUserId);
 }

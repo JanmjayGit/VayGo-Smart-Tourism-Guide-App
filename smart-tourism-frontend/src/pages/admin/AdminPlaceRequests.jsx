@@ -73,10 +73,10 @@ export default function AdminPlaceRequests() {
                     <p className="text-sm text-gray-400 mt-0.5">Review and approve user-submitted places</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Badge className="bg-teal-50 text-black border-teal-200 border">
+                    <Badge className="bg-indigo-50 text-black border-indigo-500 border">
                         <Clock className="w-3.5 h-3.5 mr-1.5" /> {places.length} Pending
                     </Badge>
-                    <Button variant="outline" size="sm" onClick={fetchPending} className="rounded-xl gap-2 bg-teal-600 text-white border-teal-600 hover:bg-teal-700 hover:text-white hover:border-teal-700">
+                    <Button variant="outline" size="sm" onClick={fetchPending} className="rounded-xl gap-2 bg-indigo-500 text-white border-indigo-500 hover:bg-indigo-600 hover:text-white hover:border-indigo-500">
                         <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
                     </Button>
                 </div>
@@ -94,11 +94,11 @@ export default function AdminPlaceRequests() {
                 <div className="lg:col-span-2">
                     {loading ? (
                         <div className="flex items-center justify-center py-20">
-                            <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+                            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
                         </div>
                     ) : filtered.length === 0 ? (
                         <div className="text-center py-20">
-                            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                            <CheckCircle2 className="w-12 h-12 text-indigo-600 mx-auto mb-3" />
                             <p className="font-semibold text-gray-600">No pending place requests</p>
                             <p className="text-sm text-gray-400">All caught up!</p>
                         </div>
@@ -127,13 +127,13 @@ export default function AdminPlaceRequests() {
                                     </div>
 
                                     <div className="flex gap-2 mt-3">
-                                        <Button size="sm" variant="outline" className="rounded-xl text-red-600 border-red-200 hover:bg-red-50 flex-1 gap-1.5"
+                                        <Button size="sm" variant="outline" className="rounded-xl text-red-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 flex-1 gap-1.5"
                                             onClick={e => { e.stopPropagation(); handleReject(place.id); }}
                                             disabled={actionLoading === `reject-${place.id}`}>
                                             {actionLoading === `reject-${place.id}` ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
                                             Reject
                                         </Button>
-                                        <Button size="sm" className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex-1 gap-1.5"
+                                        <Button size="sm" className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex-1 gap-1.5"
                                             onClick={e => { e.stopPropagation(); handleVerify(place.id); }}
                                             disabled={actionLoading === `verify-${place.id}`}>
                                             {actionLoading === `verify-${place.id}` ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -178,11 +178,11 @@ export default function AdminPlaceRequests() {
                                     {previewPlace.submittedByUserId && <p><span className="font-medium">Submitted by:</span> User #{previewPlace.submittedByUserId}</p>}
                                 </div>
                                 <div className="flex gap-2 pt-2">
-                                    <Button size="sm" variant="outline" className="flex-1 rounded-xl text-red-600 border-red-200 hover:bg-red-50"
+                                    <Button size="sm" variant="outline" className="flex-1 rounded-xl bg-red-50 border border-red-200 text-red-600 hover:text-red-600 hover:border-red-300 hover:bg-red-100"
                                         onClick={() => handleReject(previewPlace.id)} disabled={actionLoading?.startsWith('reject')}>
                                         Reject
                                     </Button>
-                                    <Button size="sm" className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    <Button size="sm" className="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                                         onClick={() => handleVerify(previewPlace.id)} disabled={actionLoading?.startsWith('verify')}>
                                         Approve
                                     </Button>

@@ -13,8 +13,10 @@ import apiEndpoints from '@/util/apiEndpoints';
 import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 
 const PLACE_CATEGORIES = [
-    'ATTRACTION', 'HISTORICAL_SITE', 'RELIGIOUS_SITE', 'PARK', 'BEACH',
-    'MOUNTAIN', 'TREK', 'MUSEUM', 'ADVENTURE_ACTIVITY', 'RESTAURANT', 'CAFE', 'OTHER'
+    'ATTRACTION', 'MUSEUM', 'HISTORICAL_SITE', 'TEMPLE', 'PARK',
+    'BEACH', 'HOTEL', 'RESORT', 'HOSTEL', 'MOUNTAIN', 'TREK',
+    'RESTAURANT', 'CAFE', 'STREET_FOOD', 'EVENT', 'ADVENTURE_ACTIVITY',
+    'SHOPPING_MALL', 'AIRPORT', 'HOSPITAL', 'OTHER'
 ];
 
 function Field({ label, name, type = 'text', placeholder, required, hint, value, onChange, error }) {

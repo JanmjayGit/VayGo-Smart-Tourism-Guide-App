@@ -32,6 +32,11 @@ public class EmergencyController {
     private final EmergencyService emergencyService;
     private final EmergencyNotificationService emergencyNotificationService;
 
+    @GetMapping
+    public ResponseEntity<List<EmergencyServiceDto>> getAll() {
+        return ResponseEntity.ok(emergencyService.getAll());
+    }
+
     // find near by places
     @GetMapping("/nearby")
     public ResponseEntity<List<EmergencyServiceDto>> findNearby(

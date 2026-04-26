@@ -4,6 +4,7 @@ import SmartTourismGuide.app.dto.request.*;
 import SmartTourismGuide.app.dto.response.*;
 import SmartTourismGuide.app.dto.update.*;
 import SmartTourismGuide.app.entity.Place;
+import SmartTourismGuide.app.enums.PlaceStatus;
 import SmartTourismGuide.app.exceptions.ResourceNotFoundException;
 import SmartTourismGuide.app.mapper.PlaceMapper;
 import SmartTourismGuide.app.repository.PlaceRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -313,9 +315,45 @@ public class PlaceServiceImpl implements PlaceService {
                 place.setPriceRange(dto.getPriceRange());
                 // Mark as PENDING — awaiting admin review
                 place.setVerified(false);
+                place.setStatus(PlaceStatus.PENDING);
                 place.setSubmittedByUserId(userId);
                 return PlaceMapper.toPlaceDetailsDto(placeRepository.save(place));
         }
+
+        // User: fetch own submitted places
+        @Override
+        @Transactional(readOnly = true)
+        public java.util.List<PlaceDetailsDto> getUserPlaces(Long userId) {
+                return placeRepository.findBySubmittedByUserIdAndDeletedFalse(userId)
+                        .stream()
+                        .map(PlaceMapper::toPlaceDetailsDto)
+                        .collect(Collectors.toList());
+        }
+
+        // User: edit own PENDING place
+        @Override
+        @Transactional
+        public PlaceDetailsDto userEditPlace(Long placeId, Long userId, CreatePlaceDto dto) {
+                Place place = placeRepository.findByIdAndDeletedFalse(placeId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Place", "id", placeId));
+
+                if (!userId.equals(place.getSubmittedByUserId())) {
+                        throw new AccessDeniedException(
+                                "You can only edit your own submissions");
+                }
+                if (place.getVerified()) {
+                        throw new IllegalStateException("Cannot edit an already-approved place");
+                }
+
+                if (dto.getName() != null)        place.setName(dto.getName());
+                if (dto.getDescription() != null) place.setDescription(dto.getDescription());
+                if (dto.getCity() != null)        place.setCity(dto.getCity());
+                if (dto.getImageUrl() != null)    place.setImageUrl(dto.getImageUrl());
+                if (dto.getAddress() != null)     place.setAddress(dto.getAddress());
+
+                return PlaceMapper.toPlaceDetailsDto(placeRepository.save(place));
+        }
+
 
         @Override
         @Transactional(readOnly = true)
@@ -326,6 +364,7 @@ public class PlaceServiceImpl implements PlaceService {
                                 .map(PlaceMapper::toPlaceDetailsDto);
         }
 
+
         @Override
         @Transactional
         public PlaceDetailsDto verifyPlace(Long placeId) {
@@ -335,6 +374,7 @@ public class PlaceServiceImpl implements PlaceService {
                         throw new IllegalStateException("Cannot verify a deleted place");
                 }
                 place.setVerified(true);
+                place.setStatus(PlaceStatus.APPROVED);
                 return PlaceMapper.toPlaceDetailsDto(placeRepository.save(place));
         }
 
@@ -342,6 +382,8 @@ public class PlaceServiceImpl implements PlaceService {
         public void rejectPlace(Long placeId) {
                 Place place = placeRepository.findById(placeId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Place", "id", placeId));
+
+                place.setStatus(PlaceStatus.REJECTED);
                 place.setDeleted(true);
                 place.setDeletedAt(java.time.LocalDateTime.now());
                 placeRepository.save(place);

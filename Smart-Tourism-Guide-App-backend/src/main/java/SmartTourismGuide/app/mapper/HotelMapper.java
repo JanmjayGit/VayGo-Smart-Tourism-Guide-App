@@ -229,14 +229,6 @@ public class HotelMapper {
                 .build();
     }
 
-    public static HotelResponseDto toHotelResponseDto(Place place, Double distance) {
-        return toHotelResponseDto(place, distance, null);
-    }
-
-    public static HotelResponseDto toHotelResponseDto(Place place) {
-        return toHotelResponseDto(place, null, null);
-    }
-
     public static RoomResponseDto toRoomResponseDto(Room room) {
         return toRoomResponseDto(room, room.getAvailableRooms());
     }

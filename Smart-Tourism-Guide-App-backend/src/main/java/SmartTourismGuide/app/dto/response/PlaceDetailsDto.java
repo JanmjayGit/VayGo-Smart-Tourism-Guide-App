@@ -1,6 +1,7 @@
 package SmartTourismGuide.app.dto.response;
 
 import SmartTourismGuide.app.enums.PlaceCategory;
+import SmartTourismGuide.app.enums.PlaceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,4 +34,5 @@ public class PlaceDetailsDto {
     private Integer priceRange;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private PlaceStatus status;
 }

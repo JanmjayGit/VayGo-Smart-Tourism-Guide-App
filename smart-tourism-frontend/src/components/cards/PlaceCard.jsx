@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Star, ChevronLeft, ChevronRight, MapMinusIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const FALLBACK_IMAGE = '/placeholder-place.jpg';
@@ -12,7 +12,7 @@ export default function PlaceCard({ place, onToggleFavorite }) {
 
     const images = place.images?.length ? place.images : [place.imageUrl || FALLBACK_IMAGE];
 
-    // Try multiple possible field names your API might use
+
     const rating = place.averageRating || place.rating || place.avgRating || 0;
     const reviewCount =
         place.reviewCount ??
@@ -20,10 +20,10 @@ export default function PlaceCard({ place, onToggleFavorite }) {
         place.numReviews ??
         place.ratingsCount ??
         place.reviews?.length ??
-        place.popularity ??   // backend stores review count in popularity field
+        place.popularity ??
         0;
 
-    // Safely get string fields — guard against literal "undefined" / "null" strings
+
     const safe = (val) => (val && val !== 'undefined' && val !== 'null' ? val : null);
     const location = safe(place.location) || safe(place.city) || safe(place.address);
     const description = safe(place.description) || safe(place.about) || safe(place.summary);
@@ -51,8 +51,8 @@ export default function PlaceCard({ place, onToggleFavorite }) {
             className="group cursor-pointer select-none"
             style={{ fontFamily: "'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif" }}
         >
-            {/* Photo — 4:3 ratio (shorter/smaller than square) */}
-            <div className="relative w-full overflow-hidden rounded-xl bg-gray-100" style={{ aspectRatio: '4/3' }}>
+            {/* Photo — 4:3 ratio */}
+            <div className="relative w-full overflow-hidden rounded-xl bg-gray-100 transistion-all duration-200 ease-out hover:-translate-y-3 hover:shadow-2xl" style={{ aspectRatio: '4/3' }}>
                 {!imgError ? (
                     <img
                         src={images[currentImg]}
@@ -63,7 +63,9 @@ export default function PlaceCard({ place, onToggleFavorite }) {
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                        <span className="text-5xl">🏔</span>
+                        <span className="text-5xl">
+                            <MapMinusIcon className="w-12 h-12" />
+                        </span>
                     </div>
                 )}
 
@@ -88,8 +90,8 @@ export default function PlaceCard({ place, onToggleFavorite }) {
                 {/* Category pill */}
                 <div className="absolute top-2.5 left-2.5 z-10">
                     <span
-                        className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                        style={{ background: 'rgba(255,255,255,0.92)', color: '#222', backdropFilter: 'blur(4px)' }}
+                        className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-black/40 text-white"
+                    // style={{ background: 'rgba(255,255,255,0.92)', color: '#222', backdropFilter: 'blur(4px)' }}
                     >
                         {place.category}
                     </span>

@@ -52,8 +52,6 @@ public class AdminEventController {
         return ResponseEntity.ok().build();
     }
 
-    // ── Moderation endpoints ────────────────────────────────────────────────────
-
     @GetMapping("/pending")
     public ResponseEntity<Page<EventDto>> getPendingEvents(
             @RequestParam(defaultValue = "0") int page,

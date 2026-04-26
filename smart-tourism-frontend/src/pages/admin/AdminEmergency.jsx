@@ -20,7 +20,14 @@ import DataTable from '@/components/admin/DataTable';
 import PageHeader from '@/components/admin/PageHeader';
 import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
-const CATEGORIES = ['HOSPITAL', 'POLICE_STATION', 'FIRE_STATION', 'PHARMACY'];
+const CATEGORIES = [
+    'HOSPITAL',
+    'POLICE_STATION',
+    'FIRE_STATION',
+    'AMBULANCE',
+    'PHARMACY',
+    'BLOOD_BANK'
+];
 
 const emptyForm = {
     name: '', category: '', phone: '', address: '', city: '', state: '',
@@ -139,7 +146,14 @@ export default function AdminEmergency() {
     };
 
     const categoryLabel = (cat) => {
-        const map = { HOSPITAL: '🏥 Hospital', POLICE_STATION: '🚔 Police', FIRE_STATION: '🚒 Fire', PHARMACY: '💊 Pharmacy' };
+        const map = {
+            HOSPITAL: 'Hospital',
+            POLICE_STATION: 'Police Station',
+            FIRE_STATION: 'Fire Station',
+            AMBULANCE: 'Ambulance',
+            PHARMACY: 'Pharmacy',
+            BLOOD_BANK: 'Blood Bank'
+        };
         return map[cat] || cat;
     };
 

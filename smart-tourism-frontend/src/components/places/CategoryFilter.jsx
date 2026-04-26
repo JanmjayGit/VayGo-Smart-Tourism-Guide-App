@@ -1,10 +1,10 @@
-import { Building2, Landmark, Church, Trees, Waves, Utensils, Bike, Coffee, Mountain, Ticket } from 'lucide-react';
+import { Building2, Landmark, Church, Trees, Waves, Utensils, Bike, Coffee, Mountain, Ticket, HouseHeart } from 'lucide-react';
 
 const categories = [
     { id: null, label: 'All Places', icon: null },
     { id: 'ATTRACTION', label: 'Attractions', icon: Ticket },
     { id: 'HISTORICAL_SITE', label: 'Historical', icon: Landmark },
-    { id: 'RELIGIOUS_SITE', label: 'Religious', icon: Church },
+    { id: 'TEMPLE', label: 'Temple', icon: HouseHeart },
     { id: 'PARK', label: 'Parks', icon: Trees },
     { id: 'BEACH', label: 'Beach', icon: Waves },
     { id: 'MOUNTAIN', label: 'Mountains', icon: Mountain },

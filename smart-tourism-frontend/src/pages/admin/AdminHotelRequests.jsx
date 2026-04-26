@@ -56,7 +56,7 @@ function RequestCard({ hotel, onApprove, onReject }) {
                             </p>
                         )}
                     </div>
-                    <Badge className="bg-yellow-100 text-yellow-700 shrink-0">Pending</Badge>
+                    <Badge className="bg-indigo-100 text-indigo-600 shrink-0">Pending</Badge>
                 </div>
 
                 {hotel.description && (
@@ -72,7 +72,7 @@ function RequestCard({ hotel, onApprove, onReject }) {
                 <div className="flex gap-2">
                     <Button
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white rounded-xl gap-1.5"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl gap-1.5"
                         onClick={handleApprove}
                         disabled={approving || rejecting}
                     >
@@ -82,7 +82,7 @@ function RequestCard({ hotel, onApprove, onReject }) {
                     <Button
                         size="sm"
                         variant="outline"
-                        className="border-red-300 text-red-500 hover:bg-red-50 rounded-xl gap-1.5"
+                        className="border-red-300 bg-red-50 text-red-500 hover:text-red-600 hover:border-red-200 hover:bg-red-100 rounded-xl gap-1.5"
                         onClick={handleReject}
                         disabled={approving || rejecting}
                     >
@@ -141,7 +141,7 @@ export default function AdminHotelRequests() {
                     <p className="text-gray-500 text-sm">User-submitted hotels awaiting review.</p>
                 </div>
                 {hotels.length > 0 && (
-                    <Badge className="bg-yellow-100 text-yellow-700 text-sm px-3 py-1">
+                    <Badge className="bg-indigo-100 text-indigo-600 text-sm px-3 py-1">
                         <Building2 className="w-3.5 h-3.5 mr-1.5" />
                         {hotels.length} pending
                     </Badge>
@@ -154,9 +154,9 @@ export default function AdminHotelRequests() {
                 </div>
             ) : hotels.length === 0 ? (
                 <div className="text-center py-20 space-y-3">
-                    <CheckCircle2 className="mx-auto w-12 h-12 text-green-400" />
+                    <CheckCircle2 className="mx-auto w-12 h-12 text-indigo-600" />
                     <h3 className="text-xl font-bold text-gray-700">All caught up!</h3>
-                    <p className="text-gray-400 text-sm">No pending hotel submission requests.</p>
+                    <p className="text-gray-500 text-sm">No pending hotel submission requests.</p>
                 </div>
             ) : (
                 <div className="space-y-4">

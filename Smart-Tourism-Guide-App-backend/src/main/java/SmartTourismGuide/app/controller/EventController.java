@@ -142,7 +142,7 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
-    // ── User submission ────────────────────────────────────────────────────
+    // User submission
 
     @PostMapping("/submit")
     @PreAuthorize("isAuthenticated()")
@@ -154,7 +154,7 @@ public class EventController {
                 .body(eventService.submitEvent(userDetails.getId(), request));
     }
 
-    // ── Similar Events ───────────────────────────────────────────────
+    // Similar Events
 
     @GetMapping("/similar")
     public ResponseEntity<List<EventSummaryDto>> getSimilarEvents(
@@ -162,5 +162,25 @@ public class EventController {
             @RequestParam(defaultValue = "8") int limit) {
         log.info("Fetching similar events for eventId: {}", eventId);
         return ResponseEntity.ok(eventService.getSimilarEvents(eventId, limit));
+    }
+
+    //  User: fetch own event submissions
+    @GetMapping("/my")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<EventDto>> getMyEvents(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("Fetching events submitted by user: {}", userDetails.getId());
+        return ResponseEntity.ok(eventService.getUserEvents(userDetails.getId()));
+    }
+
+    // User: edit own PENDING event
+    @PutMapping("/{id}/edit")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<EventDto> editMyEvent(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateEventRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("User {} editing event {}", userDetails.getId(), id);
+        return ResponseEntity.ok(eventService.userEditEvent(id, userDetails.getId(), request));
     }
 }

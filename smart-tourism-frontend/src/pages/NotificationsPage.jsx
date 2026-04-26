@@ -5,203 +5,234 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
     Bell, Check, CheckCheck, Trash2, Info, AlertTriangle,
-    Star, Calendar, MapPin, Filter
+    Star, Calendar, MapPin, Filter, Cloud, Zap
 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
 import { toast } from 'sonner';
 
-const typeIcons = {
-    REVIEW: Star,
-    EVENT: Calendar,
-    PLACE: MapPin,
-    ALERT: AlertTriangle,
-    INFO: Info,
+
+const TYPE_CONFIG = {
+    EVENT_ALERT: {
+        icon: Calendar,
+        bg: 'bg-[#D4745F]/10',
+        text: 'text-[#D4745F]',
+        border: 'border-[#D4745F]/30',
+        label: 'Event',
+    },
+    WEATHER_ALERT: {
+        icon: Cloud,
+        bg: 'bg-[#1A3A52]/10',
+        text: 'text-[#1A3A52]',
+        border: 'border-[#1A3A52]/30',
+        label: 'Weather',
+    },
+    EMERGENCY_ALERT: {
+        icon: AlertTriangle,
+        bg: 'bg-[#B85D48]/10',
+        text: 'text-[#B85D48]',
+        border: 'border-[#B85D48]/30',
+        label: 'Emergency',
+    },
+    RECOMMENDATION: {
+        icon: Zap,
+        bg: 'bg-[#8B9D83]/10',
+        text: 'text-[#8B9D83]',
+        border: 'border-[#8B9D83]/30',
+        label: 'Recommendation',
+    },
 };
 
-const typeColors = {
-    REVIEW: { bg: 'bg-[#C9A961]/10', text: 'text-[#C9A961]', border: 'border-[#C9A961]/30' },
-    EVENT: { bg: 'bg-[#D4745F]/10', text: 'text-[#D4745F]', border: 'border-[#D4745F]/30' },
-    PLACE: { bg: 'bg-[#8B9D83]/10', text: 'text-[#8B9D83]', border: 'border-[#8B9D83]/30' },
-    ALERT: { bg: 'bg-[#B85D48]/10', text: 'text-[#B85D48]', border: 'border-[#B85D48]/30' },
-    INFO: { bg: 'bg-[#1A3A52]/10', text: 'text-[#1A3A52]', border: 'border-[#1A3A52]/30' },
+// Fallback for unknown types
+const DEFAULT_CONFIG = {
+    icon: Info,
+    bg: 'bg-gray-100',
+    text: 'text-gray-500',
+    border: 'border-gray-200',
+    label: 'Info',
 };
+
+const FILTER_TABS = ['ALL', 'UNREAD', 'EVENT_ALERT', 'WEATHER_ALERT', 'EMERGENCY_ALERT', 'RECOMMENDATION'];
+const FILTER_LABELS = {
+    ALL: 'All',
+    UNREAD: 'Unread',
+    EVENT_ALERT: 'Events',
+    WEATHER_ALERT: 'Weather',
+    EMERGENCY_ALERT: 'Emergency',
+    RECOMMENDATION: 'Tips',
+};
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMins = Math.floor((now - date) / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// Only showing UPDATED parts — keep your imports same
 
 export default function NotificationsPage() {
     const { notifications, unreadCount, loading, markAsRead, markAllAsRead, refetch } = useNotifications();
     const [filter, setFilter] = useState('ALL');
     const [deleting, setDeleting] = useState(null);
 
-    const filteredNotifications = filter === 'ALL'
-        ? notifications
-        : filter === 'UNREAD'
-            ? notifications.filter(n => !n.read)
-            : notifications.filter(n => n.type === filter);
-
-    const handleDelete = async (id) => {
-        try {
-            setDeleting(id);
-            const token = localStorage.getItem('token');
-            await axios.delete(apiEndpoints.DELETE_NOTIFICATION(id), {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            toast.success('Notification deleted');
-            refetch();
-        } catch (err) {
-            toast.error('Failed to delete notification');
-        } finally {
-            setDeleting(null);
-        }
-    };
-
-    const formatDate = (dateStr) => {
-        if (!dateStr) return '';
-        const date = new Date(dateStr);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins} min ago`;
-        const diffHours = Math.floor(diffMins / 60);
-        if (diffHours < 24) return `${diffHours} hours ago`;
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    };
+    const filteredNotifications = (() => {
+        if (filter === 'ALL') return notifications;
+        if (filter === 'UNREAD') return notifications.filter(n => !n.read && !n.isRead);
+        return notifications.filter(n => n.type === filter);
+    })();
 
     return (
-        <div className="min-h-screen bg-[#F5F1E8]">
-            {/* Hero */}
-            <section className="relative py-16 px-6 overflow-hidden">
-                <div className="absolute inset-0 gradient-hero opacity-95" />
-                <div className="relative z-10 max-w-4xl mx-auto text-center">
-                    <span className="font-accent text-sm tracking-[0.3em] text-white/70 mb-4 block">
-                        STAY UPDATED
-                    </span>
-                    <h1 className="font-display text-5xl md:text-6xl font-black text-white mb-4">
-                        Notifications
-                    </h1>
-                    <p className="font-body text-lg text-white/80">
-                        {unreadCount > 0
-                            ? `You have ${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}`
-                            : 'You\'re all caught up!'
-                        }
-                    </p>
+        <div className="min-h-screen bg-[#F8F6F2]">
+
+            {/* 🔥 PREMIUM HEADER */}
+            <div className="sticky top-0 z-30 backdrop-blur-xl bg-white/70 border-b border-[#E5DED3]">
+                <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+
+                    <div>
+                        <h1 className="text-xl font-semibold text-[#2C3333]">Notifications</h1>
+                        <p className="text-xs text-[#6B7280] mt-0.5">
+                            {unreadCount > 0
+                                ? `${unreadCount} unread`
+                                : 'All caught up'}
+                        </p>
+                    </div>
+
+                    {unreadCount > 0 && (
+                        <Button
+                            size="sm"
+                            onClick={markAllAsRead}
+                            className="bg-[#2C3333] text-white hover:bg-black text-xs"
+                        >
+                            <CheckCheck className="w-4 h-4 mr-1" />
+                            Mark all
+                        </Button>
+                    )}
                 </div>
-            </section>
+            </div>
 
-            <div className="max-w-3xl mx-auto px-6 -mt-6 relative z-10 pb-12">
-                {/* Actions Bar */}
-                <Card className="border-0 shadow-organic-lg mb-6">
-                    <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-                                <Filter className="w-4 h-4 text-[#4A5759] shrink-0" />
-                                {['ALL', 'UNREAD', 'EVENT', 'REVIEW', 'ALERT'].map((f) => (
-                                    <Badge
-                                        key={f}
-                                        variant={filter === f ? 'default' : 'outline'}
-                                        className={`cursor-pointer whitespace-nowrap font-accent text-[10px] tracking-wider px-3 py-1.5 transition-all ${filter === f
-                                                ? 'bg-[#D4745F] text-white border-[#D4745F]'
-                                                : 'bg-white text-[#4A5759] border-[#D4C4B0] hover:border-[#D4745F]'
-                                            }`}
-                                        onClick={() => setFilter(f)}
-                                    >
-                                        {f}
-                                    </Badge>
-                                ))}
-                            </div>
-                            {unreadCount > 0 && (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={markAllAsRead}
-                                    className="font-accent text-xs tracking-wider border-[#D4745F] text-[#D4745F] hover:bg-[#D4745F] hover:text-white shrink-0"
-                                >
-                                    <CheckCheck className="w-4 h-4 mr-1" />
-                                    MARK ALL READ
-                                </Button>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+            <div className="max-w-3xl mx-auto px-6 py-6">
 
-                {/* Notifications List */}
+                {/* 🔥 FILTER BAR */}
+                <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide">
+                    {FILTER_TABS.map((f) => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`
+                                px-4 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap
+                                ${filter === f
+                                    ? 'bg-[#2C3333] text-white shadow'
+                                    : 'bg-white border border-[#E5DED3] text-[#4A5759] hover:border-[#2C3333]'
+                                }
+                            `}
+                        >
+                            {FILTER_LABELS[f]}
+                        </button>
+                    ))}
+                </div>
+
+                {/* 🔥 LIST */}
                 {loading ? (
                     <div className="space-y-3">
-                        {[1, 2, 3, 4, 5].map(i => (
-                            <Skeleton key={i} className="h-20 rounded-xl" />
-                        ))}
+                        {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-xl" />)}
                     </div>
                 ) : filteredNotifications.length === 0 ? (
-                    <Card className="border-0 shadow-organic">
-                        <CardContent className="p-12 text-center">
-                            <Bell className="w-16 h-16 text-[#D4C4B0] mx-auto mb-4" />
-                            <h3 className="font-display text-xl text-[#2C3333] mb-2">No notifications</h3>
-                            <p className="font-body text-sm text-[#4A5759]">
-                                {filter === 'UNREAD' ? 'All notifications have been read!' : 'No notifications to display.'}
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <div className="text-center py-20">
+                        <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-sm text-gray-500">
+                            {filter === 'UNREAD' ? 'No unread notifications' : 'No notifications yet'}
+                        </p>
+                    </div>
                 ) : (
-                    <div className="space-y-3">
-                        {filteredNotifications.map((notif, index) => {
-                            const TypeIcon = typeIcons[notif.type] || Info;
-                            const colors = typeColors[notif.type] || typeColors.INFO;
+                    <div className="space-y-2">
+
+                        {filteredNotifications.map((notif) => {
+                            const cfg = TYPE_CONFIG[notif.type] ?? DEFAULT_CONFIG;
+                            const Icon = cfg.icon;
+                            const isRead = notif.read || notif.isRead;
+                            const sentAt = notif.sentAt || notif.createdAt;
 
                             return (
-                                <Card
-                                    key={notif.id || index}
-                                    className={`border-0 shadow-organic hover:shadow-organic-lg transition-all duration-500 animate-fade-in-up ${!notif.read ? 'ring-1 ring-[#D4745F]/20' : ''
-                                        }`}
-                                    style={{ animationDelay: `${index * 0.05}s` }}
+                                <div
+                                    key={notif.id}
+                                    className={`
+                                        group flex items-start gap-4 p-4 rounded-xl transition-all
+                                        border
+                                        ${isRead
+                                            ? 'bg-white border-[#E5DED3]'
+                                            : 'bg-[#FFF7F5] border-[#F2CFC6]'
+                                        }
+                                        hover:shadow-md
+                                    `}
                                 >
-                                    <CardContent className="p-4">
-                                        <div className="flex items-start gap-4">
-                                            <div className={`w-10 h-10 rounded-full ${colors.bg} flex items-center justify-center shrink-0`}>
-                                                <TypeIcon className={`w-5 h-5 ${colors.text}`} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <p className={`font-body text-sm text-[#2C3333] leading-relaxed ${!notif.read ? 'font-semibold' : ''}`}>
-                                                        {notif.message || notif.title}
+
+                                    {/* ICON */}
+                                    <div className={`
+                                        w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                                        ${cfg.bg}
+                                    `}>
+                                        <Icon className={`w-5 h-5 ${cfg.text}`} />
+                                    </div>
+
+                                    {/* CONTENT */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start gap-2">
+
+                                            <div>
+                                                <p className={`
+                                                    text-sm leading-relaxed
+                                                    ${isRead ? 'text-[#4A5759]' : 'text-[#2C3333] font-semibold'}
+                                                `}>
+                                                    {notif.title || notif.message}
+                                                </p>
+
+                                                {notif.message !== notif.title && (
+                                                    <p className="text-xs text-gray-500 mt-0.5">
+                                                        {notif.message}
                                                     </p>
-                                                    {!notif.read && (
-                                                        <div className="w-2.5 h-2.5 rounded-full bg-[#D4745F] mt-1.5 shrink-0" />
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-3 mt-2">
-                                                    <span className="font-body text-xs text-[#4A5759]">
-                                                        {formatDate(notif.createdAt || notif.timestamp)}
-                                                    </span>
-                                                    {notif.type && (
-                                                        <Badge variant="outline" className={`text-[9px] font-accent tracking-wider ${colors.border} ${colors.text}`}>
-                                                            {notif.type}
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-1 shrink-0">
-                                                {!notif.read && (
-                                                    <Button
-                                                        variant="ghost" size="icon"
-                                                        className="w-8 h-8 hover:bg-[#8B9D83]/10"
-                                                        onClick={() => markAsRead(notif.id)}
-                                                    >
-                                                        <Check className="w-4 h-4 text-[#8B9D83]" />
-                                                    </Button>
                                                 )}
-                                                <Button
-                                                    variant="ghost" size="icon"
-                                                    className="w-8 h-8 hover:bg-[#B85D48]/10"
-                                                    onClick={() => handleDelete(notif.id)}
-                                                    disabled={deleting === notif.id}
-                                                >
-                                                    <Trash2 className="w-4 h-4 text-[#B85D48]" />
-                                                </Button>
                                             </div>
+
+                                            {!isRead && (
+                                                <div className="w-2 h-2 rounded-full bg-[#D4745F] mt-2" />
+                                            )}
                                         </div>
-                                    </CardContent>
-                                </Card>
+
+                                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                                            <span>{formatDate(sentAt)}</span>
+                                            <span>•</span>
+                                            <span>{cfg.label}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* ACTIONS */}
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+
+                                        {!isRead && (
+                                            <button
+                                                onClick={() => markAsRead(notif.id)}
+                                                className="p-2 rounded-lg hover:bg-green-50"
+                                            >
+                                                <Check className="w-4 h-4 text-green-600" />
+                                            </button>
+                                        )}
+
+                                        <button
+                                            onClick={() => handleDelete(notif.id)}
+                                            disabled={deleting === notif.id}
+                                            className="p-2 rounded-lg hover:bg-red-50"
+                                        >
+                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                        </button>
+                                    </div>
+                                </div>
                             );
                         })}
                     </div>

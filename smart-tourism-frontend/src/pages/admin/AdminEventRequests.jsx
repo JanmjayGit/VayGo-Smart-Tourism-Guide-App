@@ -76,10 +76,10 @@ export default function AdminEventRequests() {
                     <p className="text-sm text-gray-400 mt-0.5">Review and approve user-submitted events</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Badge className="bg-teal-50 text-black border-teal-200 border">
+                    <Badge className="bg-indigo-50 text-black border-indigo-500 border">
                         <Clock className="w-3.5 h-3.5 mr-1.5" /> {events.length} Pending
                     </Badge>
-                    <Button variant="outline" size="sm" onClick={fetchPending} className="rounded-xl gap-2 bg-gray-800 text-white border-gray-800">
+                    <Button variant="outline" size="sm" onClick={fetchPending} className="rounded-xl gap-2 bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700">
                         <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
                     </Button>
@@ -100,9 +100,9 @@ export default function AdminEventRequests() {
                 </div>
             ) : filtered.length === 0 ? (
                 <div className="text-center py-20">
-                    <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                    <CheckCircle2 className="w-12 h-12 text-indigo-600 mx-auto mb-3" />
                     <p className="font-semibold text-gray-600">No pending event requests</p>
-                    <p className="text-sm text-gray-400">All caught up!</p>
+                    <p className="text-sm text-gray-500">All caught up!</p>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -150,7 +150,7 @@ export default function AdminEventRequests() {
                                     <Button
                                         size="sm"
                                         variant="outline"
-                                        className="rounded-xl text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 gap-1.5"
+                                        className="rounded-xl text-red-600 border-red-200 bg-red-50 hover:text-red-600  hover:border-red-300 hover:bg-red-100 gap-1.5"
                                         onClick={() => handleReject(event.id)}
                                         disabled={actionLoading === `reject-${event.id}`}
                                     >
@@ -159,7 +159,7 @@ export default function AdminEventRequests() {
                                     </Button>
                                     <Button
                                         size="sm"
-                                        className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+                                        className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5"
                                         onClick={() => handleVerify(event.id)}
                                         disabled={actionLoading === `verify-${event.id}`}
                                     >

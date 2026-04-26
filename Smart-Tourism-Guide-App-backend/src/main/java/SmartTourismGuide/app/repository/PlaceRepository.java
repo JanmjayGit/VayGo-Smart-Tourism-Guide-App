@@ -92,6 +92,9 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
         // Moderation
         Page<Place> findByVerifiedFalseAndDeletedFalse(Pageable pageable);
 
+        // User contributions
+        List<Place> findBySubmittedByUserIdAndDeletedFalse(Long submittedByUserId);
+
         // Hotel-specific queries
         Page<Place> findByCategoryAndCityContainingIgnoreCaseAndDeletedFalse(
                         PlaceCategory category, String city, Pageable pageable);
@@ -234,5 +237,10 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
                         @Param("minLat") Double minLat,
                         @Param("maxLat") Double maxLat,
                         @Param("minLon") Double minLon,
-                        @Param("maxLon") Double maxLon);
+                        @Param("maxLon") Double maxLon
+        );
+
+        List<Place> findBySubmittedByUserIdAndDeletedFalseOrderByCreatedAtDesc(Long submittedByUserId);
+
+
 }

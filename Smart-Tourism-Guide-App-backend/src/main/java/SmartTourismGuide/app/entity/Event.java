@@ -97,13 +97,9 @@ public class Event {
     @lombok.Builder.Default
     private Boolean deleted = false;
 
-    // ── User submission & moderation ─────────────────────────────────────────
-    /** true = visible publicly; false = awaiting admin review */
     @Column(nullable = false)
     @lombok.Builder.Default
     private Boolean verified = true;
-
-    /** ID of the user who submitted this event (null if admin-created) */
     @Column(name = "submitted_by_user_id")
     private Long submittedByUserId;
 

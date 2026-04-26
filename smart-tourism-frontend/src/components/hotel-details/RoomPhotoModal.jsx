@@ -30,7 +30,7 @@ export default function RoomPhotoModal({
                     <img
                         src={images[index]}
                         alt={`${title} ${index + 1}`}
-                        className="w-full max-h-[75vh] object-cover"
+                        className="w-full max-h-[60vh] object-cover"
                     />
                 </div>
 
@@ -39,7 +39,7 @@ export default function RoomPhotoModal({
                         <button
                             type="button"
                             onClick={onPrev}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white text-gray-900 rounded-full w-11 h-11 text-xl shadow-lg"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-black rounded-full w-11 h-11 text-xl"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -47,7 +47,7 @@ export default function RoomPhotoModal({
                         <button
                             type="button"
                             onClick={onNext}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white text-gray-900 rounded-full w-11 h-11 text-xl shadow-lg"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-black rounded-full w-11 h-11 text-xl"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>

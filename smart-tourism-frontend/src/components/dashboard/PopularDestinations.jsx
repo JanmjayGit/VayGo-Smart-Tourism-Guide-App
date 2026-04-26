@@ -87,7 +87,7 @@ export default function PopularDestinations() {
                             className="cursor-pointer group"
                         >
                             {/* Image */}
-                            <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
+                            <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-3">
                                 <img
                                     src={place.imageUrl || "/placeholder.jpg"}
                                     alt={place.name}

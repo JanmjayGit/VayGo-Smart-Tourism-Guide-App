@@ -23,7 +23,7 @@ const NAV_SECTIONS = [
             { path: '/admin/event-requests', label: 'Event Requests', icon: Calendar, badge: 'New' },
             { path: '/admin/place-requests', label: 'Place Requests', icon: MapPin, badge: 'New' },
             { path: '/admin/hotels', label: 'All Hotels', icon: Hotel },
-            { path: '/admin/hotel-requests', label: 'Hotel Requests', icon: Hotel, badge: 'New' },
+            // { path: '/admin/hotel-requests', label: 'Hotel Requests', icon: Hotel, badge: 'New' },
             { path: '/admin/add-hotel', label: 'Add Hotel', icon: PlusCircle },
         ]
     },
@@ -62,7 +62,7 @@ export default function AdminSidebar() {
                         </div>
                         <div>
                             <p className="text-[13px] font-bold text-slate-800 leading-none">Admin Panel</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">TravelBuddy</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">VayGo</p>
                         </div>
                     </div>
                 )}

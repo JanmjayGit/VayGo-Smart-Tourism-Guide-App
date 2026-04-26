@@ -1,10 +1,9 @@
--- ============================================================
 -- VayGo Hotel Entity Migration Script
 -- Run this BEFORE restarting the Spring Boot backend
--- ============================================================
+
 
 -- STEP 1: Migrate hotel records from places → hotels
--- ============================================================
+
 
 INSERT INTO hotels (
     id,
@@ -57,9 +56,7 @@ FROM places
 WHERE places.category = 'HOTEL'
 ON DUPLICATE KEY UPDATE hotels.id = hotels.id;
 
--- ============================================================
 -- STEP 2: Migrate gallery images
--- ============================================================
 
 INSERT INTO hotel_images (hotel_id, image_url)
 SELECT
@@ -71,9 +68,8 @@ WHERE place_photos.place_id IN (
 )
 ON DUPLICATE KEY UPDATE hotel_id = hotel_id;
 
--- ============================================================
 -- STEP 3: Verify migration
--- ============================================================
+
 
 SELECT
     (SELECT COUNT(*) FROM places WHERE places.category = 'HOTEL' AND places.deleted = false) AS places_hotel_count,
@@ -91,12 +87,3 @@ WHERE NOT EXISTS (
     SELECT 1 FROM hotels h WHERE h.id = b.hotel_id
 );
 
--- ============================================================
--- STEP 4 (OPTIONAL)
--- Soft delete hotel records from places
--- ============================================================
-
--- UPDATE places
--- SET deleted = true, deleted_at = NOW()
--- WHERE category = 'HOTEL'
---   AND verified = true;

@@ -48,4 +48,9 @@ public interface EventService {
     void rejectEvent(Long id);
 
     List<EventSummaryDto> getSimilarEvents(Long eventId, int limit);
+
+    // ── User: fetch own submissions & edit pending ─────────────────────────────
+    List<EventDto> getUserEvents(Long userId);
+
+    EventDto userEditEvent(Long eventId, Long userId, CreateEventRequest request);
 }

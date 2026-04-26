@@ -325,6 +325,44 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toSet());
     }
 
+    // ── User: fetch own event submissions ────────────────────────────────────
+    @Override
+    @Transactional(readOnly = true)
+    public List<EventDto> getUserEvents(Long userId) {
+        log.info("Fetching events submitted by user: {}", userId);
+        return eventRepository
+                .findBySubmittedByUserIdAndDeletedFalseOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(eventMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // ── User: edit own PENDING event ─────────────────────────────────────────
+    @Override
+    @Transactional
+    public EventDto userEditEvent(Long eventId, Long userId, CreateEventRequest request) {
+        log.info("User {} editing event {}", userId, eventId);
+
+        Event event = eventRepository.findByIdAndDeletedFalse(eventId)
+                .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        if (!userId.equals(event.getSubmittedByUserId())) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You can only edit your own submissions");
+        }
+        if (event.getVerified()) {
+            throw new IllegalStateException("Cannot edit an already-approved event");
+        }
+
+        if (request.getName() != null)        event.setName(request.getName());
+        if (request.getDescription() != null) event.setDescription(request.getDescription());
+        if (request.getCity() != null)        event.setCity(request.getCity());
+        if (request.getImageUrl() != null)    event.setImageUrl(request.getImageUrl());
+        if (request.getVenue() != null)       event.setVenue(request.getVenue());
+
+        return eventMapper.toDto(eventRepository.save(event));
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<EventSummaryDto> getSimilarEvents(Long eventId, int limit) {
@@ -336,43 +374,20 @@ public class EventServiceImpl implements EventService {
         LocalDate today = LocalDate.now();
         Set<String> sourceKeywords = extractKeywords(source.getName());
 
-        // 1. Fetch same-category candidates
-        List<Event> categoryMatches = eventRepository
-                .findSimilarByCategory(eventId, source.getCategory(), today, Pageable.unpaged()).getContent();
+        // Candidate pool = same-category events ONLY.
+        // Cross-category keyword matches are intentionally excluded —
+        // a CONCERT viewer must never see SPORTS events.
+        List<Event> candidates = eventRepository
+                .findSimilarByCategory(eventId, source.getCategory(), today);
 
-        // 2. Fetch keyword candidates (run a DB LIKE for each keyword, merge)
-        Set<Long> seen = new HashSet<>();
-        Map<Long, Event> candidateMap = new LinkedHashMap<>();
-
-        categoryMatches.forEach(e -> {
-            seen.add(e.getId());
-            candidateMap.put(e.getId(), e);
-        });
-
-        sourceKeywords.forEach(kw -> {
-            List<Event> kwMatches = eventRepository.findByNameKeyword(eventId, kw, today);
-            kwMatches.forEach(e -> {
-                if (!seen.contains(e.getId())) {
-                    seen.add(e.getId());
-                    candidateMap.put(e.getId(), e);
-                }
-            });
-        });
-
-        // 3. Score and sort
-        // Score: 3 (category + keyword), 2 (keyword only), 1 (category only)
-        return candidateMap.values().stream()
+        // Re-rank within same-category pool using keyword overlap.
+        // score 3 = category + keyword match  (shown first)
+        // score 1 = category only             (shown after)
+        return candidates.stream()
                 .map(candidate -> {
-                    int score = 0;
-                    boolean sameCategory = candidate.getCategory() == source.getCategory();
                     Set<String> candidateKw = extractKeywords(candidate.getName());
-                    boolean hasCommonKeyword = candidateKw.stream().anyMatch(sourceKeywords::contains);
-
-                    if (sameCategory)
-                        score += 1;
-                    if (hasCommonKeyword)
-                        score += 2; // keyword match weighs more
-
+                    boolean hasCommonKeyword = !Collections.disjoint(candidateKw, sourceKeywords);
+                    int score = hasCommonKeyword ? 3 : 1;
                     return Map.entry(candidate, score);
                 })
                 .sorted(Map.Entry.<Event, Integer>comparingByValue().reversed())

@@ -16,6 +16,7 @@ import NearbyCard from '@/components/hotel-details/NearbyCard';
 import BookingCard, { openRazorpay } from '@/components/hotel-details/BookingCard';
 import MapView from '@/components/map/MapView';
 import RoomPhotoModal from '@/components/hotel-details/RoomPhotoModal';
+import RoomList from '@/components/hotel-details/RoomList';
 
 const TODAY = new Date().toISOString().split('T')[0];
 const AMENITY_ICONS = { WiFi: Wifi, Parking: Car, Pool: Waves, Kitchen: ChefHat, Gym: Dumbbell };
@@ -294,13 +295,6 @@ export default function HotelDetails() {
                                     </span>
                                 )}
                             </div>
-
-                            {hotel.rating != null && (
-                                <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-2xl shrink-0">
-                                    <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                                    <span className="font-bold text-gray-800">{Number(hotel.rating).toFixed(1)}</span>
-                                </div>
-                            )}
                         </div>
 
                         {hotel.description && (
@@ -347,88 +341,13 @@ export default function HotelDetails() {
                                 <p className="text-sm text-red-500">No rooms available for the selected dates.</p>
                             ) : (
                                 <div className="grid gap-4">
-                                    {availableRooms.map((room) => {
-                                        const roomImages = room.imageUrls?.length
-                                            ? room.imageUrls
-                                            : hotel.imageUrls?.length
-                                                ? hotel.imageUrls
-                                                : hotel.imageUrl
-                                                    ? [hotel.imageUrl]
-                                                    : [];
-
-                                        const isSelected = selectedRoomId === room.id;
-
-                                        return (
-                                            <div
-                                                key={room.id}
-                                                className={`rounded-3xl border-2 overflow-hidden transition-all ${isSelected
-                                                    ? 'border-teal-500 bg-teal-50/40 shadow-sm'
-                                                    : 'border-gray-200 bg-white'
-                                                    }`}
-                                            >
-                                                <div className="grid md:grid-cols-[240px_1fr]">
-                                                    <div className="bg-gray-100 h-52 md:h-full">
-                                                        {roomImages.length > 0 ? (
-                                                            <img
-                                                                src={roomImages[0]}
-                                                                alt={`${room.roomType} room`}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                                <Hotel className="w-10 h-10" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="p-5 flex flex-col justify-between gap-4">
-                                                        <div className="flex items-start justify-between gap-4">
-                                                            <div>
-                                                                <p className="font-semibold text-gray-900 text-lg">
-                                                                    {room.roomType} Room
-                                                                </p>
-                                                                {room.description && (
-                                                                    <p className="text-gray-500 text-sm mt-1">{room.description}</p>
-                                                                )}
-                                                                <p className="text-sm mt-2 text-teal-600 font-medium">
-                                                                    {room.availableRooms} available · up to {room.capacity} guests
-                                                                </p>
-                                                            </div>
-
-                                                            <div className="text-right shrink-0">
-                                                                <p className="font-bold text-gray-900 text-2xl">
-                                                                    ₹{Number(room.pricePerNight || 0).toLocaleString('en-IN')}
-                                                                </p>
-                                                                <p className="text-sm text-gray-400">/ night</p>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex flex-wrap gap-3">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                className="rounded-xl"
-                                                                onClick={() => openRoomPhotos(room)}
-                                                            >
-                                                                View Photos
-                                                            </Button>
-
-                                                            <Button
-                                                                type="button"
-                                                                className={`rounded-xl ${isSelected
-                                                                    ? 'bg-teal-600 hover:bg-teal-700 text-white'
-                                                                    : 'bg-gray-900 hover:bg-gray-800 text-white'
-                                                                    }`}
-                                                                onClick={() => selectRoom(room)}
-                                                            >
-                                                                {isSelected ? 'Selected' : 'Select Room'}
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                                    <RoomList
+                                        rooms={availableRooms}
+                                        hotel={hotel}
+                                        selectedRoomId={selectedRoomId}
+                                        onSelectRoom={selectRoom}
+                                        onViewPhotos={openRoomPhotos}
+                                    />
                                 </div>
 
                             )}
@@ -437,7 +356,7 @@ export default function HotelDetails() {
                         <div className="flex flex-wrap gap-3 pb-5 border-b border-gray-100">
                             <div className='w-full h-[500px]'>
                                 <MapView
-                                    markers={[{ lat: hotel.latitude, lng: hotel.longitude, name: hotel.name }]}
+                                    markers={[{ lat: hotel.latitude, lng: hotel.longitude, location: hotel.address }]}
                                     center={{ lat: hotel.latitude, lng: hotel.longitude }}
                                     zoom={12}
                                 />

@@ -116,7 +116,7 @@ export default function Favorites() {
                         <p className="text-gray-600 mb-6">
                             Start exploring and save your favorite places!
                         </p>
-                        <Button onClick={() => navigate('/places')}>
+                        <Button onClick={() => navigate('/places')} className="bg-teal-600 text-white hover:bg-teal-700">
                             Explore Places
                         </Button>
                     </div>
@@ -127,7 +127,7 @@ export default function Favorites() {
 
                                 {/* Image */}
                                 <div
-                                    className="relative w-full aspect-[1/1] overflow-hidden rounded-3xl"
+                                    className="relative w-full aspect-[4/3] overflow-hidden rounded-xl transistion-all duration-200 ease-out hover:-translate-y-3 hover:shadow-2xl"
                                     onClick={() => navigate(`/places/${favorite.placeId}`)}
                                 >
                                     <img
@@ -142,7 +142,7 @@ export default function Favorites() {
                                             e.stopPropagation();
                                             handleRemoveFavorite(favorite.placeId);
                                         }}
-                                        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-md hover:scale-110 transition"
+                                        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/50 backdrop-blur-md flex items-center justify-center shadow-md hover:scale-110 transition"
                                     >
                                         <Trash2 className="h-4 w-4 text-red-500" />
                                     </button>

@@ -3,7 +3,6 @@ import { Thermometer, Droplets, Wind } from 'lucide-react';
 import { conditionEmoji } from '@/hooks/useWeather';
 
 
-// ── SVG cubic-bezier wave ────────────────────────────────────────────────────
 function TempWave({ hourly, metric }) {
     if (!hourly.length) {
         return <div className="h-40 animate-pulse bg-slate-100 rounded-xl" />;
@@ -72,9 +71,7 @@ function TempWave({ hourly, metric }) {
     );
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function TemperatureTimeline({ hourly }) {
-    // Active metric: 'temp' | 'humidity' | 'windSpeed'
     const [metric, setMetric] = useState('temp');
 
     const toggles = [

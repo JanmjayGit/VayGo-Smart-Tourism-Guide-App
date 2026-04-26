@@ -82,6 +82,7 @@ public class NotificationServiceImpl implements NotificationService {
                 "/queue/personal",
                 notification);
 
+        notification.setUserId(userId);
         // Always persist user-specific notifications
         persistNotification(notification);
     }
@@ -149,7 +150,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .title(notificationDto.getTitle())
                 .message(notificationDto.getMessage())
                 .priority(notificationDto.getPriority())
-                .userId(notificationDto.getId()) // Set if user-specific
+                .userId(notificationDto.getUserId()) // null = broadcast (visible to all users)
                 .data(notificationDto.getData())
                 .isRead(false)
                 .sentAt(notificationDto.getSentAt() != null ? notificationDto.getSentAt() : LocalDateTime.now())
@@ -163,7 +164,8 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional(readOnly = true)
     public Page<NotificationDto> getUserNotifications(Long userId, Pageable pageable) {
-        Page<Notification> notifications = notificationRepository.findByUserIdOrderBySentAtDesc(userId, pageable);
+        Page<Notification> notifications = notificationRepository
+                .findByUserIdOrBroadcast(userId, pageable);
         return notifications.map(notificationMapper::toDto);
     }
 

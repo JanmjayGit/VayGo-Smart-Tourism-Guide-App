@@ -44,4 +44,5 @@ public class EventDto implements Serializable {
     private String websiteUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Boolean verified;
 }

@@ -20,6 +20,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     long countByUserIdAndIsReadFalse(Long userId);
     Page<Notification> findByUserIdAndTypeOrderBySentAtDesc(Long userId, NotificationType type, Pageable pageable);
 
+    // Returns user-specific + broadcast (userId IS NULL) notifications — used for the notification feed
+    @Query("SELECT n FROM Notification n WHERE (n.userId = :userId OR n.userId IS NULL) ORDER BY n.sentAt DESC")
+    Page<Notification> findByUserIdOrBroadcast(@Param("userId") Long userId, Pageable pageable);
+
     @Query("SELECT n FROM Notification n WHERE n.userId IS NULL ORDER BY n.sentAt DESC")
     Page<Notification> findBroadcastNotifications(Pageable pageable);
 

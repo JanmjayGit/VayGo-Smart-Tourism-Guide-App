@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
-import BookingCard from '@/components/cards/BookingCard';
+import BookingCardForMyBookings from '@/components/cards/BookingCardForMyBookings';
 
 
 
@@ -32,11 +32,27 @@ export default function MyBookings() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setBookings(res.data || []);
+            console.log('Booking sample:', res.data?.[0]);
         } catch (err) {
             toast.error('Failed to load bookings');
         } finally {
             setLoading(false);
         }
+    };
+
+    const deriveStatus = (booking) => {
+        if (booking.bookingStatus !== 'CONFIRMED') return booking.bookingStatus;
+
+        let checkOut = booking.checkOut;
+
+        if (Array.isArray(checkOut)) {
+            const [year, month, day] = checkOut;
+            checkOut = new Date(year, month - 1, day);
+        } else {
+            checkOut = new Date(checkOut);
+        }
+
+        return checkOut < new Date() ? 'COMPLETED' : 'CONFIRMED';
     };
 
     const handleCancel = async (id) => {
@@ -47,7 +63,9 @@ export default function MyBookings() {
         ));
     };
 
-    const filtered = activeTab === 'ALL' ? bookings : bookings.filter(b => b.bookingStatus === activeTab);
+    const filtered = activeTab === 'ALL'
+        ? bookings
+        : bookings.filter(b => deriveStatus(b) === activeTab);
 
     return (
         <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -101,7 +119,13 @@ export default function MyBookings() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {filtered.map(b => <BookingCard key={b.id} booking={b} onCancel={handleCancel} />)}
+                        {filtered.map(b => (
+                            <BookingCardForMyBookings
+                                key={b.id}
+                                booking={{ ...b, bookingStatus: deriveStatus(b) }}
+                                onCancel={handleCancel}
+                            />
+                        ))}
                     </div>
                 )}
             </div>

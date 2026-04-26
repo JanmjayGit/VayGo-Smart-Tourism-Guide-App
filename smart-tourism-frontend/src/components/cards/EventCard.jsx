@@ -22,7 +22,7 @@ export default function EventCard({ event }) {
             onClick={() => navigate(`/events/${event.id}`)}
         >
             {/* Image */}
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100 transistion-all duration-200 ease-out hover:-translate-y-3 hover:shadow-2xl">
                 <img
                     src={event.imageUrl || "/placeholder-event.jpg"}
                     alt={event.name}

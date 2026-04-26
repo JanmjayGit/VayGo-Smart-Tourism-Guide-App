@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Bell, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Bell, Lock, Eye, EyeOff, Loader2, Calendar, Cloud, AlertTriangle, Zap } from 'lucide-react';
 
 const authHeaders = (token) => ({ Authorization: `Bearer ${token}` });
 
@@ -24,67 +24,130 @@ function validatePassword(current, next, confirm) {
     return null;
 }
 
+// ── Default prefs matching NotificationPreferenceDto ─────────────────────────
+const DEFAULT_PREFS = {
+    enableEventAlerts: true,
+    enableWeatherAlerts: true,
+    enableEmergencyAlerts: true,
+    enableRecommendationAlerts: true,
+};
 
+const PREF_ITEMS = [
+    {
+        key: 'enableEventAlerts',
+        label: 'Event Alerts',
+        desc: 'Festivals, concerts, and local events',
+        icon: Calendar,
+        color: 'text-[#D4745F]',
+    },
+    {
+        key: 'enableWeatherAlerts',
+        label: 'Weather Alerts',
+        desc: 'Rain, storms, and weather warnings',
+        icon: Cloud,
+        color: 'text-blue-500',
+    },
+    {
+        key: 'enableEmergencyAlerts',
+        label: 'Emergency Alerts',
+        desc: 'Critical safety and emergency updates',
+        icon: AlertTriangle,
+        color: 'text-red-500',
+    },
+    {
+        key: 'enableRecommendationAlerts',
+        label: 'Recommendations',
+        desc: 'Personalised place and travel tips',
+        icon: Zap,
+        color: 'text-purple-500',
+    },
+];
+
+// ── Notifications section ─────────────────────────────────────────────────────
 function NotificationsSection({ token }) {
-    const [enabled, setEnabled] = useState(false);
+    const [prefs, setPrefs] = useState(DEFAULT_PREFS);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
+    const [saving, setSaving] = useState(null); // key being saved
 
+    // Fetch on mount
     useEffect(() => {
-        axios.get(apiEndpoints.NOTIFICATION_PREFERENCES, { headers: authHeaders(token) })
-            .then((res) => setEnabled(res.data?.notificationsEnabled ?? res.data?.enabled ?? false))
-            .catch(() => { })
+        axios
+            .get(apiEndpoints.NOTIFICATION_PREFERENCES, { headers: authHeaders(token) })
+            .then((res) => {
+                const data = res.data || {};
+                setPrefs({
+                    enableEventAlerts: data.enableEventAlerts ?? true,
+                    enableWeatherAlerts: data.enableWeatherAlerts ?? true,
+                    enableEmergencyAlerts: data.enableEmergencyAlerts ?? true,
+                    enableRecommendationAlerts: data.enableRecommendationAlerts ?? true,
+                });
+            })
+            .catch(() => {/* keep defaults */ })
             .finally(() => setLoading(false));
     }, [token]);
 
-    const handleToggle = async (next) => {
-        setSaving(true);
+    // Toggle a single preference and save immediately
+    const handleToggle = async (key, next) => {
+        const updated = { ...prefs, [key]: next };
+        setPrefs(updated); // optimistic update
+        setSaving(key);
         try {
             await axios.put(
                 apiEndpoints.NOTIFICATION_PREFERENCES,
-                { notificationsEnabled: next },
+                updated,          // send the full DTO so backend can merge
                 { headers: authHeaders(token) }
             );
-            setEnabled(next);
-            toast.success(`Notifications ${next ? 'enabled' : 'disabled'}`);
+            toast.success('Preference saved');
         } catch {
-            toast.error('Failed to save notification preference');
+            // revert on error
+            setPrefs(prefs);
+            toast.error('Failed to save preference');
         } finally {
-            setSaving(false);
+            setSaving(null);
         }
     };
 
     return (
-        <Card className="border border-gray-200 shadow-sm h-fit">
+        <Card className="border border-gray-200 shadow-sm">
             <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold text-gray-700 flex items-center gap-2">
                     <Bell className="w-4 h-4 text-teal-500" /> Notifications
                 </CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <p className="text-sm font-medium text-gray-800">Push Notifications</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                            Receive alerts about events, places, and updates
-                        </p>
+            <CardContent className="space-y-4">
+                {loading ? (
+                    <div className="flex items-center gap-2 text-gray-400 text-sm py-2">
+                        <Loader2 className="w-4 h-4 animate-spin" /> Loading preferences…
                     </div>
-                    {loading ? (
-                        <Loader2 className="w-5 h-5 animate-spin text-gray-400 shrink-0" />
-                    ) : (
-                        <Switch
-                            checked={enabled}
-                            onCheckedChange={handleToggle}
-                            disabled={saving}
-                            className="data-[state=checked]:bg-teal-600 shrink-0"
-                        />
-                    )}
-                </div>
+                ) : (
+                    PREF_ITEMS.map(({ key, label, desc, icon: Icon, color }) => (
+                        <div key={key} className="flex items-center justify-between gap-4">
+                            <div className="flex items-start gap-3 min-w-0">
+                                <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${color}`} />
+                                <div className="min-w-0">
+                                    <p className="text-sm font-medium text-gray-800">{label}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                                </div>
+                            </div>
+                            {saving === key ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-gray-400 shrink-0" />
+                            ) : (
+                                <Switch
+                                    checked={!!prefs[key]}
+                                    onCheckedChange={(next) => handleToggle(key, next)}
+                                    disabled={saving !== null}
+                                    className="data-[state=checked]:bg-teal-600 shrink-0"
+                                />
+                            )}
+                        </div>
+                    ))
+                )}
             </CardContent>
         </Card>
     );
 }
 
+// ── Password section ──────────────────────────────────────────────────────────
 function PasswordSection({ token }) {
     const [open, setOpen] = useState(false);
     const [formError, setFormError] = useState('');
@@ -123,6 +186,7 @@ function PasswordSection({ token }) {
                 onChange={(e) => setField(field, e.target.value)}
                 placeholder={placeholder}
                 className="pr-10 h-10 border-gray-200"
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             />
             <button
                 type="button"
@@ -148,7 +212,10 @@ function PasswordSection({ token }) {
                 </div>
                 <Dialog open={open} onOpenChange={(o) => { setOpen(o); setFormError(''); }}>
                     <DialogTrigger asChild>
-                        <Button variant="outline" className="text-sm border-gray-200 bg-gray-900 text-white hover:bg-gray-800 shrink-0">
+                        <Button
+                            variant="outline"
+                            className="text-sm border-gray-200 bg-gray-900 text-white hover:bg-gray-800 shrink-0"
+                        >
                             Change
                         </Button>
                     </DialogTrigger>
@@ -182,7 +249,7 @@ function PasswordSection({ token }) {
                                 disabled={saving}
                                 className="bg-teal-600 hover:bg-teal-700 text-white"
                             >
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                                {saving && <Loader2 className="w-4 h-4 animate-spin mr-1" />}
                                 Update Password
                             </Button>
                         </DialogFooter>
@@ -193,25 +260,26 @@ function PasswordSection({ token }) {
     );
 }
 
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function Settings() {
-    const { user } = useAuth();
     const token = localStorage.getItem('token');
 
     return (
-        <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6" style={{ fontFamily: "'Inter Tight', sans-serif" }}>
-
-            {/* Heading */}
+        <div
+            className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6"
+            style={{ fontFamily: "'Inter Tight', sans-serif" }}
+        >
             <div>
                 <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
-                <p className="text-sm text-gray-500 mt-0.5">Manage your account preferences and security</p>
+                <p className="text-sm text-gray-500 mt-0.5">
+                    Manage your account preferences and security
+                </p>
             </div>
 
-            {/* Row 1: Notifications (left) + Password (right) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 <NotificationsSection token={token} />
                 <PasswordSection token={token} />
             </div>
-
         </div>
     );
 }

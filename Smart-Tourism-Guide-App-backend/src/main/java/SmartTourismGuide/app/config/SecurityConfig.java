@@ -3,6 +3,7 @@ package SmartTourismGuide.app.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -75,17 +76,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/weather/**").permitAll()
                         .requestMatchers("/api/events/**").permitAll()
 
-                        .requestMatchers("/api/emergency/nearby").permitAll() // Public: proximity search
-                        .requestMatchers("/api/emergency/category/**").permitAll() // Public: filter by category
-                        .requestMatchers("/api/emergency/city/**").permitAll() // Public: search by city
-                        .requestMatchers("/api/emergency/24x7").permitAll() // Public: 24x7 services
-                        .requestMatchers("/api/emergency/stats").permitAll() // Public: statistics
-                        .requestMatchers("/api/emergency/{id}").permitAll() // Public: service details
-                        .requestMatchers("/api/emergency/alert").hasRole("ADMIN") // Admin: broadcast alerts
-                        .requestMatchers("/api/emergency").hasRole("ADMIN") // Admin: CRUD operations
+                        .requestMatchers(HttpMethod.GET, "/api/emergency/**").permitAll()   //  public read
+                        .requestMatchers("/api/emergency/alert").hasRole("ADMIN")          //  admin only
+                        .requestMatchers("/api/emergency/**").hasRole("ADMIN")             // create/update/deleteequestMatchers("/api/emergency").hasRole("ADMIN") // Admin: CRUD operations
 
                         // Public: room availability check (no auth required to view room options)
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/bookings/hotels/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bookings/hotels/**").permitAll()
 
                         .requestMatchers("/api/reviews/place/**").permitAll()
                         .requestMatchers("/api/reviews/**").authenticated()

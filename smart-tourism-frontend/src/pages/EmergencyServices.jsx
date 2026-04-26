@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Hospital, Shield, Flame } from 'lucide-react';
+import {
+    Phone, MapPin, AlertCircle, Hospital, Shield, Flame, Droplet, Ambulance
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,18 +10,32 @@ import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
 
 const serviceIcons = {
-    POLICE: Shield,
     HOSPITAL: Hospital,
-    FIRE: Flame,
-    AMBULANCE: AlertCircle,
+    POLICE_STATION: Shield,
+    FIRE_STATION: Flame,
+    AMBULANCE: Ambulance,
+    PHARMACY: AlertCircle,
+    BLOOD_BANK: Droplet,
 };
 
 const serviceColors = {
-    POLICE: 'bg-blue-100 text-blue-800 border-blue-300',
     HOSPITAL: 'bg-red-100 text-red-800 border-red-300',
-    FIRE: 'bg-orange-100 text-orange-800 border-orange-300',
+    POLICE_STATION: 'bg-blue-100 text-blue-800 border-blue-300',
+    FIRE_STATION: 'bg-orange-100 text-orange-800 border-orange-300',
     AMBULANCE: 'bg-green-100 text-green-800 border-green-300',
+    PHARMACY: 'bg-purple-100 text-purple-800 border-purple-300',
+    BLOOD_BANK: 'bg-pink-100 text-pink-800 border-pink-300',
 };
+
+const categoryLabel = (cat) => ({
+    HOSPITAL: 'Hospital',
+    POLICE_STATION: 'Police Station',
+    FIRE_STATION: 'Fire Station',
+    AMBULANCE: 'Ambulance',
+    PHARMACY: 'Pharmacy',
+    BLOOD_BANK: 'Blood Bank',
+}[cat] || cat);
+
 
 export default function EmergencyServices() {
     const [services, setServices] = useState([]);
@@ -40,15 +56,16 @@ export default function EmergencyServices() {
             if (selectedCity) {
                 response = await axios.get(apiEndpoints.EMERGENCY_BY_CITY(selectedCity));
             } else {
+                response = await axios.get(apiEndpoints.GET_ALL_EMERGENCY);
                 // Try nearby with default location (Delhi), or fetch all
-                try {
-                    response = await axios.get(apiEndpoints.NEARBY_EMERGENCY, {
-                        params: { latitude: 28.6139, longitude: 77.2090, radius: 50 }
-                    });
-                } catch {
-                    // Fallback to city-based search
-                    response = await axios.get(apiEndpoints.EMERGENCY_BY_CITY('Delhi'));
-                }
+                // try {
+                //     response = await axios.get(apiEndpoints.NEARBY_EMERGENCY, {
+                //         params: { latitude: 28.6139, longitude: 77.2090, radius: 50 }
+                //     });
+                // } catch {
+                //     // Fallback to city-based search
+                //     response = await axios.get(apiEndpoints.EMERGENCY_BY_CITY('Delhi'));
+                // }
             }
 
             const data = response.data;
@@ -132,15 +149,16 @@ export default function EmergencyServices() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {services.map((service) => {
-                            const Icon = serviceIcons[service.type] || AlertCircle;
-                            const colorClass = serviceColors[service.type] || 'bg-gray-100 text-gray-800';
+                            const Icon = serviceIcons[service.category] || AlertCircle;
+                            const colorClass = serviceColors[service.category] || 'bg-gray-100 text-gray-800';
 
                             return (
                                 <Card key={service.id} className="hover:shadow-lg transition-shadow">
                                     <CardHeader className={`${colorClass} border-b`}>
                                         <div className="flex items-center gap-3">
                                             <Icon className="h-8 w-8" />
-                                            <CardTitle>{service.name}</CardTitle>
+                                            {/* <CardTitle>{service.name}</CardTitle> */}
+                                            <CardTitle>{categoryLabel(service.category)}</CardTitle>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="pt-4 space-y-3">
@@ -150,10 +168,10 @@ export default function EmergencyServices() {
                                             <div className="flex-1">
                                                 <p className="text-sm text-gray-600">Emergency Number</p>
                                                 <a
-                                                    href={`tel:${service.phoneNumber}`}
+                                                    href={`tel:${service.phone}`}
                                                     className="font-bold text-lg text-blue-600 hover:underline"
                                                 >
-                                                    {service.phoneNumber}
+                                                    {service.phone || service.contactNumber || '—'}
                                                 </a>
                                             </div>
                                         </div>
@@ -186,7 +204,7 @@ export default function EmergencyServices() {
                                                 variant="default"
                                                 asChild
                                             >
-                                                <a href={`tel:${service.phoneNumber}`}>
+                                                <a href={`tel:${service.phone || service.contactNumber}`}>
                                                     <Phone className="h-4 w-4 mr-2" />
                                                     Call Now
                                                 </a>

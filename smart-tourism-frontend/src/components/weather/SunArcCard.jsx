@@ -1,14 +1,8 @@
-/**
- * SunArcCard
- * Shows a dashed SVG semi-circle arc with an orange dot marking
- * the current sun position between sunset and sunrise.
- * Props: sunrise (epoch sec), sunset (epoch sec)
- */
 function SunArc({ sunrise, sunset }) {
     const now = Date.now() / 1000;
     const total = sunrise && sunset ? (sunset + 86400 - sunrise) % 86400 : 1;
     const elapsed = sunrise ? Math.max(0, Math.min(1, (now - sunrise) / total)) : 0.4;
-    const angle = elapsed * 180; // 0° = left (sunset end), 180° = right (sunrise end)
+    const angle = elapsed * 180;
     const rad = (angle * Math.PI) / 180;
     const cx = 130, cy = 120, r = 90;
     const dotX = cx + r * Math.cos(Math.PI - rad);

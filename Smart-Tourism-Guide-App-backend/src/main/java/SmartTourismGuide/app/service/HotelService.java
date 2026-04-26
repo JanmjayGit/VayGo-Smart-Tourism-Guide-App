@@ -6,11 +6,13 @@ import SmartTourismGuide.app.dto.update.*;
 import SmartTourismGuide.app.entity.User;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface HotelService {
 
         HotelResponseDto createHotel(CreateHotelDto createDto);
 
-        HotelResponseDto requestHotel(CreateHotelDto createDto); // user submission — verified=false
+        HotelResponseDto requestHotel(CreateHotelDto createDto, Long userId); // user submission — verified=false
 
         HotelResponseDto updateHotel(Long hotelId, UpdateHotelDto updateDto);
 
@@ -33,4 +35,9 @@ public interface HotelService {
                         int page, int size);
 
         Page<HotelResponseDto> getHotelsWithUser(int page, int size);
+
+        List<HotelResponseDto> getUserHotels(Long userId);
+
+        HotelResponseDto userEditHotel(Long hotelId, Long userId, UpdateHotelDto dto);
 }
+

@@ -2,10 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
 
-const OWM_KEY = import.meta.env.VITE_OWM_API_KEY || 'dd8cd8cd8e6a9d28b4b0eea29c4d46e6';
+const OWM_KEY = import.meta.env.VITE_OWM_API_KEY;
 const OWM_BASE = 'https://api.openweathermap.org/data/2.5';
 
-// ── Weather condition → emoji ─────────────────────────────────────────────────
 export const conditionEmoji = (condition = '') => {
     const c = condition.toLowerCase();
     if (c.includes('thunderstorm')) return '⛈️';
@@ -18,7 +17,6 @@ export const conditionEmoji = (condition = '') => {
     return '🌡️';
 };
 
-// ── AQI 1-5 → label + colour ─────────────────────────────────────────────────
 export const aqiLabel = (aqi) => {
     if (aqi === 1) return { label: 'Good', color: '#22c55e' };
     if (aqi === 2) return { label: 'Fair', color: '#84cc16' };
@@ -27,7 +25,6 @@ export const aqiLabel = (aqi) => {
     return { label: 'Hazardous', color: '#ef4444' };
 };
 
-// ── UV index → label + colour ─────────────────────────────────────────────────
 export const uvLabel = (uvi) => {
     if (uvi <= 2) return { label: 'Low', color: '#22c55e' };
     if (uvi <= 5) return { label: 'Moderate', color: '#f59e0b' };
@@ -36,8 +33,6 @@ export const uvLabel = (uvi) => {
     return { label: 'Extreme', color: '#9333ea' };
 };
 
-// ── Determine the dominant air pollutant from OWM components ─────────────────
-// Returns the human-readable name of the pollutant with the highest concentration.
 const dominantPollutant = (components = {}) => {
     const pollutants = [
         { key: 'pm2_5', label: 'PM 2.5' },
@@ -57,7 +52,6 @@ const dominantPollutant = (components = {}) => {
 };
 
 
-// ── Hourly slot targets: always pick Morning / Afternoon / Evening / Night ──────
 const SLOT_TARGETS = [
     { label: 'Morning', targetHour: 6 },
     { label: 'Afternoon', targetHour: 12 },
@@ -65,7 +59,6 @@ const SLOT_TARGETS = [
     { label: 'Night', targetHour: 21 },
 ];
 
-// For each target scan the full forecast list and pick the slot whose hour is closest.
 const pickSlots = (list) =>
     SLOT_TARGETS.map(({ label, targetHour }) => {
         const slot = list.reduce((best, s) => {
@@ -82,17 +75,15 @@ const pickSlots = (list) =>
         };
     });
 
-// ── Main hook ─────────────────────────────────────────────────────────────────
 export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
-    const [weather, setWeather] = useState(null);   // backend WeatherDto
-    const [extra, setExtra] = useState(null);   // { sunrise, sunset }
-    const [forecast, setForecast] = useState([]);     // next-6-day array
-    const [aqi, setAqi] = useState(null);   // { aqi, pm25, mainPollutant }
-    const [hourly, setHourly] = useState([]);     // 4 slots: { label, temp, humidity, windSpeed, condition }
+    const [weather, setWeather] = useState(null);
+    const [extra, setExtra] = useState(null);
+    const [forecast, setForecast] = useState([]);
+    const [aqi, setAqi] = useState(null);
+    const [hourly, setHourly] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // ── fetchExtras: called with confirmed lat/lon ────────────────────────────
     const fetchExtras = useCallback(async (lat2, lon2, sys) => {
         const [fRes, aqiRes] = await Promise.allSettled([
             axios.get(`${OWM_BASE}/forecast`, {
@@ -103,14 +94,11 @@ export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
             }),
         ]);
 
-        // Sunrise / sunset
         setExtra({ sunrise: sys?.sunrise, sunset: sys?.sunset });
 
-        // ── Forecast ──────────────────────────────────────────────────────────
         if (fRes.status === 'fulfilled') {
             const list = fRes.value.data.list;
 
-            // Group by calendar date
             const byDay = {};
             list.forEach(s => {
                 const date = s.dt_txt.split(' ')[0];
@@ -118,8 +106,6 @@ export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
                 byDay[date].push(s);
             });
 
-            // For each day pick the 12:00 slot (most representative of daytime)
-            // Fall back to first slot if 12:00 isn't in the next 40 items
             const days = Object.entries(byDay).slice(0, 7).map(([date, slots]) => {
                 const noon = slots.find(s => s.dt_txt.includes('12:00:00')) || slots[0];
                 const allTemps = slots.map(s => s.main.temp);
@@ -131,16 +117,15 @@ export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
                     low: Math.round(Math.min(...allTemps)),
                     humidity: noon.main.humidity,
                     windSpeed: noon.wind?.speed ?? 0,
-                    pop: noon.pop ?? 0, // probability of precipitation 0–1
+                    pop: noon.pop ?? 0,
                 };
             });
             setForecast(days);
 
-            // Hourly — always 4 named slots: Morning / Afternoon / Evening / Night
             setHourly(pickSlots(list));
         }
 
-        // ── AQI ───────────────────────────────────────────────────────────────
+        // air quality
         if (aqiRes.status === 'fulfilled') {
             const item = aqiRes.value.data.list[0];
             const comp = item.components || {};
@@ -153,12 +138,10 @@ export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
         }
     }, []);
 
-    // ── fetchAll: resolve city or coords then call backend + OWM ─────────────
     const fetchAll = useCallback(async (resolvedCity, resolvedLat, resolvedLon) => {
         setLoading(true);
         setError(null);
         try {
-            // 1. Primary: current weather from backend (sets the main error if this fails)
             let backendRes;
             if (resolvedCity) {
                 backendRes = await axios.get(apiEndpoints.WEATHER_BY_CITY(resolvedCity));
@@ -172,8 +155,6 @@ export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
             const lat2 = backendRes.data?.latitude || resolvedLat;
             const lon2 = backendRes.data?.longitude || resolvedLon;
 
-            // 2. Secondary: OWM extras — wrapped in its own try-catch so a
-            //    failure here never overwrites the successfully loaded weather
             try {
                 const owmParams = lat2 && lon2
                     ? { lat: lat2, lon: lon2, appid: OWM_KEY, units: 'metric' }
@@ -183,19 +164,17 @@ export const useWeather = ({ city = null, lat = null, lon = null } = {}) => {
                 const { coord, sys } = owmCur.data;
                 await fetchExtras(coord?.lat ?? lat2, coord?.lon ?? lon2, sys);
             } catch (extrasErr) {
-                // Extras failed (OWM quota, network, etc.) — show weather but skip extras
-                console.warn('[useWeather] extras fetch failed:', extrasErr.message);
+                //Extras failed
             }
 
         } catch (err) {
-            // Primary backend call failed — show the error panel
             setError(err.response?.data?.message || 'Failed to fetch weather');
         } finally {
             setLoading(false);
         }
     }, [fetchExtras]);
 
-    // ── Effect: trigger on city / coords change ───────────────────────────────
+
     useEffect(() => {
         if (city) {
             fetchAll(city, null, null);

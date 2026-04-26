@@ -122,6 +122,7 @@ public class EventMapper {
                 .websiteUrl(event.getWebsiteUrl())
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())
+                .verified(event.getVerified())
                 .build();
     }
 

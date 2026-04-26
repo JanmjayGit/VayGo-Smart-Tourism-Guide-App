@@ -95,7 +95,7 @@ export default function PopularPlaces() {
                             className="text-4xl sm:text-5xl font-black text-gray-900"
                             style={{ fontFamily: "'Inter Tight', sans-serif" }}
                         >
-                            Must-Visit Places
+                            Most Visited Places
                         </h2>
                     </div>
                     <button

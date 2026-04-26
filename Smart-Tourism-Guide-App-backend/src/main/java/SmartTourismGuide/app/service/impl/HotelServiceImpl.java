@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,23 +36,43 @@ public class HotelServiceImpl implements HotelService {
     @Transactional
     public HotelResponseDto createHotel(CreateHotelDto dto) {
         Hotel hotel = buildHotelFromDto(dto);
-        hotel.setVerified(true); // admin-created → immediately verified
+        hotel.setVerified(true); // admin-created -> immediately verified
         hotel.setAvailabilityStatus(true);
         Hotel saved = hotelRepository.save(hotel);
         return withRooms(saved, null);
     }
 
+
     @Override
     @Transactional
-    public HotelResponseDto requestHotel(CreateHotelDto dto) {
-        Hotel hotel = buildHotelFromDto(dto);
-        hotel.setVerified(false); // user-submitted → needs approval
-        hotel.setAvailabilityStatus(false);
-//        hotel.setSubmittedByUserId(userId);
-        Hotel saved = hotelRepository.save(hotel);
-//        return HotelMapper.toHotelResponseDto(saved);
-        return withRooms(saved, null);
+    public HotelResponseDto requestHotel(CreateHotelDto dto, Long userId) {
+        Hotel hotel = new Hotel();
+        hotel.setName(dto.getName());
+        hotel.setDescription(dto.getDescription());
+        hotel.setCity(dto.getCity());
+        hotel.setAddress(dto.getAddress());
+        hotel.setContactInfo(dto.getContactInfo());
+        hotel.setOpeningHours(dto.getOpeningHours());
+        hotel.setPriceRange(String.valueOf(dto.getPriceRange()));
+        hotel.setLatitude(dto.getLatitude() != null
+                ? new java.math.BigDecimal(dto.getLatitude().toString())
+                : java.math.BigDecimal.ZERO);
+        hotel.setLongitude(dto.getLongitude() != null
+                ? new java.math.BigDecimal(dto.getLongitude().toString())
+                : java.math.BigDecimal.ZERO);
+        hotel.setPricePerNight(dto.getPricePerNight());
+        hotel.setRating(dto.getRating());
+        hotel.setImageUrl(dto.getImageUrl());
+        hotel.setImageUrls(dto.getImageUrls() != null ? dto.getImageUrls() : new java.util.ArrayList<>());
+        hotel.setAmenities(dto.getAmenities());
+        hotel.setVerified(false);            // pending admin approval
+        hotel.setDeleted(false);
+        hotel.setAvailabilityStatus(false);  // not bookable until approved
+        hotel.setPopularity(0L);
+        hotel.setSubmittedByUserId(userId);  // ← KEY: saves who submitted it
+        return HotelMapper.toHotelResponseDto(hotelRepository.save(hotel));
     }
+
 
     // update Hotel
     @Override
@@ -216,10 +237,7 @@ public class HotelServiceImpl implements HotelService {
         return hotel;
     }
 
-//    private HotelResponseDto withRooms(Hotel hotel, Double distance) {
-//        List<Room> rooms = roomRepository.findByHotelId(hotel.getId());
-//        return HotelMapper.toHotelResponseDto(hotel, distance, rooms);
-//    }
+
     private HotelResponseDto withRooms(Hotel hotel, Double distance) {
 
         List<Room> rooms = roomRepository.findByHotelId(hotel.getId());
@@ -312,5 +330,63 @@ public class HotelServiceImpl implements HotelService {
 
             return dto;
         });
+    }
+
+
+    @Override
+   @Transactional(readOnly = true)
+   public List<HotelResponseDto> getUserHotels(Long userId) {
+       return hotelRepository
+           .findBySubmittedByUserIdAndDeletedFalseOrderByCreatedAtDesc(userId)
+           .stream()
+           .map(HotelMapper::toHotelResponseDto)
+           .collect(Collectors.toList());
+   }
+
+
+   @Override
+   @Transactional
+   public HotelResponseDto userEditHotel(Long hotelId, Long userId, UpdateHotelDto dto) {
+       Hotel hotel = hotelRepository.findById(hotelId)
+           .orElseThrow(() -> new ResourceNotFoundException("Hotel", "id", hotelId));
+
+       if (!userId.equals(hotel.getSubmittedByUserId()))
+           throw new IllegalStateException("You do not own this hotel");
+
+       if (Boolean.TRUE.equals(hotel.getVerified()))
+           throw new IllegalStateException("Hotel is already approved and cannot be edited");
+
+       if (dto.getName() != null) {
+           hotel.setName(dto.getName());
+       }
+       if (dto.getDescription() != null){
+           hotel.setDescription(dto.getDescription());
+       }
+       if (dto.getCity() != null){
+           hotel.setCity(dto.getCity());
+       }
+       if (dto.getAddress() != null) {
+           hotel.setAddress(dto.getAddress());
+       }
+       if (dto.getContactInfo() != null) {
+           hotel.setContactInfo(dto.getContactInfo());
+       }
+       if (dto.getLatitude() != null) {
+           hotel.setLatitude(dto.getLatitude());
+       }
+       if (dto.getLongitude() != null){
+           hotel.setLongitude(dto.getLongitude());
+       }
+       if (dto.getImageUrl() != null) {
+           hotel.setImageUrl(dto.getImageUrl());
+       }
+       if (dto.getPricePerNight() != null) {
+           hotel.setPricePerNight(dto.getPricePerNight());
+       }
+       if (dto.getAmenities() != null) {
+           hotel.setAmenities(dto.getAmenities());
+       }
+
+       return HotelMapper.toHotelResponseDto(hotelRepository.save(hotel));
     }
 }

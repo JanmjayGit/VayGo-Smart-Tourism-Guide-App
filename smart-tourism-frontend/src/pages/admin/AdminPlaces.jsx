@@ -21,17 +21,17 @@ import CloudinaryUpload from '@/components/admin/CloudinaryUpload';
 
 // Categories must match backend PlaceCategory enum exactly
 const CATEGORIES = [
-    'ATTRACTION', 'MUSEUM', 'HISTORICAL_SITE', 'RELIGIOUS_SITE', 'PARK',
+    'ATTRACTION', 'MUSEUM', 'HISTORICAL_SITE', 'TEMPLE', 'PARK',
     'BEACH', 'HOTEL', 'RESORT', 'HOSTEL', 'MOUNTAIN', 'TREK',
     'RESTAURANT', 'CAFE', 'STREET_FOOD', 'EVENT', 'ADVENTURE_ACTIVITY',
-    'SHOPPING_MALL', 'AIRPORT', 'HOSPITAL',
+    'SHOPPING_MALL', 'AIRPORT', 'HOSPITAL', 'OTHER'
 ];
 
 const CAT_STYLES = {
     ATTRACTION: 'bg-pink-50 text-pink-700 border-pink-200',
     MUSEUM: 'bg-violet-50 text-violet-700 border-violet-200',
     HISTORICAL_SITE: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-    RELIGIOUS_SITE: 'bg-amber-50 text-amber-700 border-amber-200',
+    TEMPLES: 'bg-amber-50 text-amber-700 border-amber-200',
     PARK: 'bg-green-50 text-green-700 border-green-200',
     BEACH: 'bg-cyan-50 text-cyan-700 border-cyan-200',
     HOTEL: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -223,10 +223,10 @@ export default function AdminPlaces() {
                         <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-3">
                             <MapPin className="w-6 h-6 text-slate-300" />
                         </div>
-                        <p className="font-medium text-slate-500">No places found</p>
+                        <p className="font-medium text-slate-500 text-lg">No places found</p>
                         <p className="text-sm mt-1">Try adjusting your search or filters</p>
-                        <Button onClick={openCreate} variant="outline" className="mt-4 gap-2">
-                            <Plus className="w-4 h-4" /> Add your first place
+                        <Button onClick={openCreate} variant="outline" className="mt-4 gap-2 text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer">
+                            Add your first place
                         </Button>
                     </CardContent>
                 ) : (
@@ -281,7 +281,7 @@ export default function AdminPlaces() {
                                             <td className="px-3 py-3">
                                                 {p.deleted
                                                     ? <Badge className="bg-red-50 text-red-600 hover:bg-red-50 border border-red-100 text-xs">Deleted</Badge>
-                                                    : <Badge className="bg-emerald-50 text-emerald-600 hover:bg-emerald-50 border border-emerald-100 text-xs">Active</Badge>
+                                                    : <Badge className="bg-indigo-50 text-indigo-600 hover:bg-indigo-50 border border-indigo-100 text-xs">Active</Badge>
                                                 }
                                             </td>
                                             <td className="px-5 py-3">

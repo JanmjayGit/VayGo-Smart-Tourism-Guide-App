@@ -94,7 +94,7 @@ function App() {
             <Route path="/admin/places" element={<AdminPlaces />} />
             <Route path="/admin/events" element={<AdminEvents />} />
             <Route path="/admin/reviews" element={<AdminReviews />} />
-            {/* <Route path="/admin/emergency" element={<AdminEmergency />} /> */}
+            <Route path="/admin/emergency" element={<AdminEmergency />} />
             <Route path="/admin/notifications" element={<AdminNotifications />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/hotel-requests" element={<AdminHotelRequests />} />
@@ -109,6 +109,7 @@ function App() {
 
           {/* 404 - Redirect to dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
         </Routes>
       </BrowserRouter>
       <Toaster position="bottom-right" richColors />

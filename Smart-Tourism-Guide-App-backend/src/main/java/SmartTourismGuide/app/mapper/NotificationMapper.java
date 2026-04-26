@@ -21,6 +21,7 @@ public class NotificationMapper {
 
         return NotificationDto.builder()
                 .id(notification.getId())
+                .userId(notification.getUserId())
                 .type(notification.getType())
                 .title(notification.getTitle())
                 .message(notification.getMessage())

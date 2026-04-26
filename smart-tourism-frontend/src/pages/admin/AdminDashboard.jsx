@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     MapPin, Calendar, MessageSquare, Siren, Bell, Users,
-    ArrowRight, TrendingUp, Activity, CheckCircle2,
+    ArrowRight, TrendingUp, Activity, CheckCircle2, Hotel
 } from 'lucide-react';
 import axios from 'axios';
 import apiEndpoints from '@/util/apiEndpoints';
@@ -18,6 +18,7 @@ const MODULES = [
     { label: 'Emergency Services', path: '/admin/emergency', icon: Siren, color: 'text-red-600', bg: 'bg-red-50', desc: 'Manage emergency contacts' },
     { label: 'Notifications', path: '/admin/notifications', icon: Bell, color: 'text-emerald-600', bg: 'bg-emerald-50', desc: 'Broadcast messages to users' },
     { label: 'User Management', path: '/admin/users', icon: Users, color: 'text-slate-600', bg: 'bg-slate-100', desc: 'View and manage users' },
+    { label: 'Manage Hotels', path: '/admin/hotels', icon: Hotel, color: 'text-slate-600', bg: 'bg-slate-100', desc: 'View and manage hotels' },
 ];
 
 const STATUS_ITEMS = [
@@ -75,13 +76,13 @@ export default function AdminDashboard() {
                             <p className="mt-2 text-sm text-slate-500">{now}</p>
                         </div>
 
-                        <div className="flex items-center gap-3 self-start rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                        <div className="flex items-center gap-3 self-start rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
-                                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                                <CheckCircle2 className="h-5 w-5 text-indigo-600" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-emerald-700">All Systems Online</p>
-                                <p className="text-xs text-emerald-600/80">Everything is running normally</p>
+                                <p className="text-sm font-semibold text-indigo-700">All Systems Online</p>
+                                <p className="text-xs text-indigo-600/80">Everything is running normally</p>
                             </div>
                         </div>
                     </div>
@@ -131,7 +132,7 @@ export default function AdminDashboard() {
                                 <h2 className="text-lg font-semibold text-slate-900">Admin Modules</h2>
                                 <p className="mt-1 text-sm text-slate-500">Core areas you manage every day</p>
                             </div>
-                            <Badge className="border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600 hover:bg-slate-50">
+                            <Badge className="border border-slate-200 bg-indigo-50 px-3 py-1 text-indigo-600 hover:bg-indigo-50">
                                 {MODULES.length} Modules
                             </Badge>
                         </div>
@@ -141,7 +142,7 @@ export default function AdminDashboard() {
                                 <button
                                     key={mod.path}
                                     onClick={() => navigate(mod.path)}
-                                    className="group flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition-all hover:border-slate-300 hover:bg-white hover:shadow-sm"
+                                    className="group flex w-full items-center justify-between rounded-2xl border border-indigo-200 bg-indigo-50 p-4 text-left transition-all hover:border-slate-300 hover:bg-white hover:shadow-sm"
                                 >
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-semibold text-slate-900">{mod.label}</p>
@@ -175,10 +176,10 @@ export default function AdminDashboard() {
                                         className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <span className={`h-2.5 w-2.5 rounded-full ${s.ok ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                            <span className={`h-2.5 w-2.5 rounded-full ${s.ok ? 'bg-indigo-500' : 'bg-amber-500'}`} />
                                             <span className="text-sm font-medium text-slate-700">{s.label}</span>
                                         </div>
-                                        <span className={`text-xs font-semibold ${s.ok ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                        <span className={`text-xs font-semibold ${s.ok ? 'text-indigo-600' : 'text-amber-600'}`}>
                                             {s.status}
                                         </span>
                                     </div>
@@ -195,27 +196,24 @@ export default function AdminDashboard() {
                             <div className="space-y-3">
                                 <Button
                                     onClick={() => navigate('/admin/places')}
-                                    className="h-12 w-full justify-start rounded-2xl bg-slate-900 px-4 text-white hover:bg-slate-800"
+                                    className="h-12 w-full justify-center rounded-2xl bg-indigo-600 px-4 text-white hover:bg-indigo-700"
                                 >
-                                    <MapPin className="mr-3 h-4 w-4" />
                                     Add New Place
                                 </Button>
 
                                 <Button
                                     onClick={() => navigate('/admin/events')}
                                     variant="outline"
-                                    className="h-12 w-full justify-start rounded-2xl border-slate-300 px-4 hover:bg-slate-50"
+                                    className="h-12 w-full justify-center rounded-2xl bg-indigo-600 px-4 text-white hover:bg-indigo-700"
                                 >
-                                    <Calendar className="mr-3 h-4 w-4 text-violet-600" />
                                     Add New Event
                                 </Button>
 
                                 <Button
                                     onClick={() => navigate('/admin/notifications')}
                                     variant="outline"
-                                    className="h-12 w-full justify-start rounded-2xl border-slate-300 px-4 hover:bg-slate-50"
+                                    className="h-12 w-full justify-center rounded-2xl bg-indigo-600 px-4 text-white hover:bg-indigo-700"
                                 >
-                                    <Bell className="mr-3 h-4 w-4 text-emerald-600" />
                                     Send Notification
                                 </Button>
                             </div>

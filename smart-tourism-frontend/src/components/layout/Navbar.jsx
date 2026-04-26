@@ -14,6 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { User, LogOut, Settings, ChevronDown, Menu, MapPin, CalendarPlus, Hotel } from 'lucide-react';
 import NotificationBell from '@/components/notifications/NotificationBell';
+import logo from '../../assets/icon.svg'
 
 const NAV_LINKS = [
     { path: '/places', label: 'Places' },
@@ -31,7 +32,10 @@ export default function Navbar() {
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    const handleLogout = () => { logout(); navigate('/'); };
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
     const getInitials = (name) => name ? name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) : 'U';
     const isActive = (path) => location.pathname === path;
 
@@ -42,12 +46,13 @@ export default function Navbar() {
 
                     {/* Logo — left */}
                     <div className="shrink-0 flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
-                            <MapPin className="w-4 h-4 text-white" />
+                        <div className="w-8 h-8 rounded-lg  flex items-center justify-center">
+                            {/* <MapPin className="w-4 h-4 text-white" /> */}
+                            <img src={logo} alt="logo" className='w-full h-full' />
                         </div>
                         <Link
                             to={user ? '/dashboard' : '/'}
-                            className="text-xl font-black text-gray-900"
+                            className="text-2xl font-black text-teal-600"
                             style={{ fontFamily: "'Inter Tight', sans-serif" }}
                         >
                             VayGo

@@ -71,6 +71,16 @@ public class EmergencyServiceImpl implements EmergencyService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<EmergencyServiceDto> getAll() {
+        return emergencyServiceRepository.findAll()
+                .stream()
+                .filter(service -> !service.getDeleted())
+                .map(emergencyServiceMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<EmergencyServiceDto> findByCategory(EmergencyServiceCategory category) {
         log.info("Finding emergency services by category: {}", category);
 

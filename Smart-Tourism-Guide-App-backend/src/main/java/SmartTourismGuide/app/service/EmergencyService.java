@@ -12,6 +12,7 @@ public interface EmergencyService {
             Double latitude, Double longitude, Double radiusKm,
             EmergencyServiceCategory category, Integer limit);
 
+    List<EmergencyServiceDto> getAll();
     List<EmergencyServiceDto> findByCategory(EmergencyServiceCategory category);
     List<EmergencyServiceDto> findByCity(String city);
     List<EmergencyServiceDto> find24x7Services();

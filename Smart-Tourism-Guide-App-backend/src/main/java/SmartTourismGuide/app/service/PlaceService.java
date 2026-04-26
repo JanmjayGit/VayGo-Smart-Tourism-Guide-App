@@ -27,8 +27,12 @@ public interface PlaceService {
 
     PlaceDetailsDto restorePlace(Long placeId);
 
-    // ── User submission & admin moderation ──────────────────────────────────
+    // User submission and admin moderation
     PlaceDetailsDto submitPlace(Long userId, CreatePlaceDto dto);
+
+    java.util.List<PlaceDetailsDto> getUserPlaces(Long userId);
+
+    PlaceDetailsDto userEditPlace(Long placeId, Long userId, CreatePlaceDto dto);
 
     org.springframework.data.domain.Page<PlaceDetailsDto> getPendingPlaces(int page, int size);
 

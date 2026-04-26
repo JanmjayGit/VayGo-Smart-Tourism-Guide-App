@@ -28,9 +28,9 @@ export default function SimilarEvents({ currentEventId }) {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <p className="text-teal-600 text-xs font-bold tracking-[0.2em] uppercase mb-1">
+                    {/* <p className="text-teal-600 text-xs font-bold tracking-[0.2em] uppercase mb-1">
                         You Might Also Like
-                    </p>
+                    </p> */}
                     <h2 className="text-2xl font-bold text-gray-900">Similar Events</h2>
                 </div>
                 <button

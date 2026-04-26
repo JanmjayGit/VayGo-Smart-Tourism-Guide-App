@@ -1,16 +1,22 @@
 package SmartTourismGuide.app.controller;
 
+import SmartTourismGuide.app.dto.request.CreatePlaceDto;
 import SmartTourismGuide.app.dto.response.NavigationResponseDto;
 import SmartTourismGuide.app.dto.request.NearbyPlacesRequestDto;
+import SmartTourismGuide.app.dto.response.PlaceDetailsDto;
 import SmartTourismGuide.app.dto.response.PlaceDto;
 import SmartTourismGuide.app.enums.PlaceCategory;
+import SmartTourismGuide.app.security.services.UserDetailsImpl;
 import SmartTourismGuide.app.service.PlaceService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,10 +34,6 @@ public class PlaceController {
                         @RequestParam(defaultValue = "0") Integer page,
                         @RequestParam(defaultValue = "20") Integer size) {
 
-                // Use the existing getAllPlaces method (returns PlaceDetailsDto)
-                // Note: This returns all places without search/filter for now
-                // Frontend will need to handle filtering client-side or we can enhance this
-                // later
                 Page<SmartTourismGuide.app.dto.response.PlaceDetailsDto> detailsPage = placeService.getAllPlaces(page,
                                 size,
                                 false);
@@ -98,20 +100,36 @@ public class PlaceController {
         }
 
         @GetMapping("/{placeId}")
-        public ResponseEntity<SmartTourismGuide.app.dto.response.PlaceDetailsDto> getPlaceDetails(
+        public ResponseEntity<PlaceDetailsDto> getPlaceDetails(
                         @PathVariable Long placeId) {
                 return ResponseEntity.ok(placeService.getPlaceById(placeId));
         }
 
-        // ── User Submission ─────────────────────────────────────────────────────
-
         @PostMapping("/submit")
-        @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
-        public ResponseEntity<SmartTourismGuide.app.dto.response.PlaceDetailsDto> submitPlace(
-                        @jakarta.validation.Valid @RequestBody SmartTourismGuide.app.dto.request.CreatePlaceDto dto,
-                        @org.springframework.security.core.annotation.AuthenticationPrincipal SmartTourismGuide.app.security.services.UserDetailsImpl userDetails) {
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<PlaceDetailsDto> submitPlace(
+                        @Valid @RequestBody CreatePlaceDto dto,
+                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
                 return ResponseEntity
                                 .status(org.springframework.http.HttpStatus.CREATED)
                                 .body(placeService.submitPlace(userDetails.getId(), dto));
+        }
+
+        // User: fetch own contributions
+        @GetMapping("/my")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<java.util.List<PlaceDetailsDto>> getMyPlaces(
+                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                return ResponseEntity.ok(placeService.getUserPlaces(userDetails.getId()));
+        }
+
+        //User: edit own PENDING submission
+        @PutMapping("/{placeId}/edit")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<PlaceDetailsDto> editMyPlace(
+                        @PathVariable Long placeId,
+                        @Valid @RequestBody CreatePlaceDto dto,
+                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                return ResponseEntity.ok(placeService.userEditPlace(placeId, userDetails.getId(), dto));
         }
 }
